@@ -1,0 +1,1956 @@
+<html lang="es" class="h-full bg-slate-950 text-slate-100"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Costes y Optimización de BOM - Inversor</title>
+    <!-- Tailwind CSS para diseño fluido y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para renderizado de gráficos vectoriales interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- KaTeX para renderizar de manera nativa ecuaciones matemáticas en LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        /* Estilos personalizados para scrollbar elegante y consistente */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-y-0{top:0px;bottom:0px}.bottom-full{bottom:100%}.left-0{left:0px}.left-1\/2{left:50%}.right-0{right:0px}.right-2{right:0.5rem}.right-4{right:1rem}.top-0{top:0px}.top-4{top:1rem}.top-full{top:100%}.z-30{z-index:30}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.ml-1{margin-left:0.25rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-1\.5{height:0.375rem}.h-16{height:4rem}.h-2{height:0.5rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-\[250px\]{height:250px}.h-full{height:100%}.w-1\.5{width:0.375rem}.w-12{width:3rem}.w-16{width:4rem}.w-2{width:0.5rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-64{width:16rem}.w-full{width:100%}.w-20{width:5rem}.max-w-\[1600px\]{max-width:1600px}.max-w-xs{max-width:20rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.border-collapse{border-collapse:collapse}.-translate-x-1\/2{--tw-translate-x:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.translate-y-2{--tw-translate-y:0.5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-help{cursor:help}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-slate-800\/50 > :not([hidden]) ~ :not([hidden]){border-color:rgb(30 41 59 / 0.5)}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-4{border-width:4px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-amber-500\/20{border-color:rgb(245 158 11 / 0.2)}.border-blue-500\/20{border-color:rgb(59 130 246 / 0.2)}.border-emerald-500\/20{border-color:rgb(16 185 129 / 0.2)}.border-rose-900\/50{border-color:rgb(136 19 55 / 0.5)}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-700\/50{border-color:rgb(51 65 85 / 0.5)}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-slate-800\/60{border-color:rgb(30 41 59 / 0.6)}.border-slate-800\/80{border-color:rgb(30 41 59 / 0.8)}.border-teal-500\/20{border-color:rgb(20 184 166 / 0.2)}.border-transparent{border-color:transparent}.border-blue-900\/40{border-color:rgb(30 58 138 / 0.4)}.border-emerald-900\/40{border-color:rgb(6 78 59 / 0.4)}.border-indigo-500\/20{border-color:rgb(99 102 241 / 0.2)}.border-rose-900\/40{border-color:rgb(136 19 55 / 0.4)}.border-slate-800\/40{border-color:rgb(30 41 59 / 0.4)}.border-violet-900\/40{border-color:rgb(76 29 149 / 0.4)}.border-t-slate-900{--tw-border-opacity:1;border-top-color:rgb(15 23 42 / var(--tw-border-opacity, 1))}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-blue-600\/10{background-color:rgb(37 99 235 / 0.1)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-rose-950\/30{background-color:rgb(76 5 25 / 0.3)}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-800\/80{background-color:rgb(30 41 59 / 0.8)}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/10{background-color:rgb(15 23 42 / 0.1)}.bg-slate-900\/20{background-color:rgb(15 23 42 / 0.2)}.bg-slate-900\/40{background-color:rgb(15 23 42 / 0.4)}.bg-slate-900\/50{background-color:rgb(15 23 42 / 0.5)}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-slate-950{--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.bg-slate-950\/80{background-color:rgb(2 6 23 / 0.8)}.bg-teal-500\/10{background-color:rgb(20 184 166 / 0.1)}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.bg-blue-500\/10{background-color:rgb(59 130 246 / 0.1)}.bg-blue-950\/20{background-color:rgb(23 37 84 / 0.2)}.bg-emerald-950\/20{background-color:rgb(2 44 34 / 0.2)}.bg-indigo-500\/10{background-color:rgb(99 102 241 / 0.1)}.bg-rose-950\/20{background-color:rgb(76 5 25 / 0.2)}.bg-slate-950\/70{background-color:rgb(2 6 23 / 0.7)}.bg-violet-950\/20{background-color:rgb(46 16 101 / 0.2)}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.pl-3{padding-left:0.75rem}.pl-9{padding-left:2.25rem}.pr-4{padding-right:1rem}.pt-4{padding-top:1rem}.pt-2{padding-top:0.5rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.font-sans{font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.normal-case{text-transform:none}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-blue-300{--tw-text-opacity:1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-blue-500\/10{color:rgb(59 130 246 / 0.1)}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-emerald-500\/10{color:rgb(16 185 129 / 0.1)}.text-indigo-500\/10{color:rgb(99 102 241 / 0.1)}.text-rose-400{--tw-text-opacity:1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-teal-400{--tw-text-opacity:1;color:rgb(45 212 191 / var(--tw-text-opacity, 1))}.text-violet-500\/10{color:rgb(139 92 246 / 0.1)}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-indigo-400{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.text-rose-300{--tw-text-opacity:1;color:rgb(253 164 175 / var(--tw-text-opacity, 1))}.text-violet-300{--tw-text-opacity:1;color:rgb(196 181 253 / var(--tw-text-opacity, 1))}.placeholder-slate-500::placeholder{--tw-placeholder-opacity:1;color:rgb(100 116 139 / var(--tw-placeholder-opacity, 1))}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur{--tw-backdrop-blur:blur(8px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.duration-300{transition-duration:300ms}.hover\:border-rose-800:hover{--tw-border-opacity:1;border-color:rgb(159 18 57 / var(--tw-border-opacity, 1))}.hover\:border-slate-600:hover{--tw-border-opacity:1;border-color:rgb(71 85 105 / var(--tw-border-opacity, 1))}.hover\:border-slate-700:hover{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-950\/50:hover{background-color:rgb(76 5 25 / 0.5)}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800\/40:hover{background-color:rgb(30 41 59 / 0.4)}.hover\:bg-slate-900:hover{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.hover\:text-amber-200:hover{--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.hover\:text-slate-300:hover{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.hover\:text-teal-200:hover{--tw-text-opacity:1;color:rgb(153 246 228 / var(--tw-text-opacity, 1))}.focus\:border-slate-700:focus{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.focus\:border-blue-500:focus{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.focus\:bg-slate-950:focus{--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.active\:bg-emerald-600:active{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.active\:bg-slate-800:active{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.group\/kpi:hover .group-hover\/kpi\:text-blue-500\/20{color:rgb(59 130 246 / 0.2)}.group\/kpi:hover .group-hover\/kpi\:text-emerald-500\/20{color:rgb(16 185 129 / 0.2)}.group\/kpi:hover .group-hover\/kpi\:text-indigo-500\/20{color:rgb(99 102 241 / 0.2)}.group\/kpi:hover .group-hover\/kpi\:text-violet-500\/20{color:rgb(139 92 246 / 0.2)}@media (min-width: 640px){.sm\:w-64{width:16rem}.sm\:w-auto{width:auto}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}}@media (min-width: 768px){.md\:w-auto{width:auto}.md\:flex-initial{flex:0 1 auto}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.lg\:grid-cols-5{grid-template-columns:repeat(5, minmax(0, 1fr))}}</style></head>
+<body class="h-full flex flex-col font-sans">
+
+    <!-- CABECERA PRINCIPAL -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 shrink-0">
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-600/10 rounded-lg border border-blue-500/20 text-blue-400">
+                    <!-- Icono de Circuito Integrado en SVG -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white">BOM Toolbox Analyzer</h1>
+                    <p class="text-xs text-slate-400">Optimization bom toolbox</p>
+                </div>
+            </div>
+            
+            <!-- Info discreta del conjunto de datos en la cabecera -->
+            <div id="headerBomInfo" class="flex items-center gap-3.5 text-[11px] text-slate-400 bg-slate-950/45 px-3 py-1.5 rounded-lg border border-slate-800/80 font-mono sm:ml-4 select-none">
+                <span class="flex h-2 w-2 rounded-full bg-slate-600 shrink-0" id="headerStatusDot"></span>
+                <span class="truncate max-w-[120px] sm:max-w-[150px]">BOM: <strong class="text-slate-200 font-semibold" id="headerBomTitle">Ninguno</strong></span>
+                <span class="text-slate-800">|</span>
+                <span>Sep: <strong class="text-slate-200 font-semibold" id="headerSeparator">-</strong></span>
+                <span class="text-slate-800">|</span>
+                <span>Reg: <strong class="text-slate-200 font-semibold" id="headerRowsCount">0</strong></span>
+                <span class="text-slate-800">|</span>
+                <span>Reg_Flatten: <strong class="text-slate-200 font-semibold" id="headerFlattenRowsCount">0</strong></span>
+            </div>
+        </div>
+
+        <!-- Acciones de Carga, Exportación y Restablecimiento -->
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <label class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg cursor-pointer text-sm font-medium transition-colors">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                <span>Cargar BOM (.csv)</span>
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+            </label>
+            <button id="loadExampleBtn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg text-sm font-medium text-slate-300 transition-colors flex items-center gap-2" title="Cargar BOM de prueba para demostración">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h0a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span>Cargar Ejemplo</span>
+            </button>
+            <button id="exportBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-600 border border-emerald-500/20 rounded-lg text-sm font-medium text-white transition-colors flex items-center gap-2" title="Exportar BOM modificada">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Exportar CSV</span>
+            </button>
+            <button id="resetBtn" class="px-4 py-2 bg-rose-950/30 hover:bg-rose-950/50 text-rose-400 border border-rose-900/50 hover:border-rose-800 rounded-lg text-sm font-medium transition-colors" title="Limpiar BOM actual">
+                Limpiar
+            </button>
+            <button id="helpBtn" class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg text-slate-300 transition-colors flex items-center justify-center" title="Ayuda y Formato de Importación">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- NOTIFICACIONES (TOAST) -->
+    <div id="toast" class="fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 bg-slate-900 border border-slate-700 text-slate-200 rounded-lg shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300">
+        <span id="toastIcon" class="text-blue-400"></span>
+        <span id="toastMessage" class="text-sm font-medium"></span>
+    </div>
+
+    <!-- CONTENIDO GENERAL -->
+    <main class="flex-1 overflow-y-auto p-6 space-y-6 max-w-[1600px] w-full mx-auto">
+
+        <!-- SECCIÓN DE KPI METRIC CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- Coste Total -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 relative group/kpi">
+                <div class="absolute top-0 right-0 p-4 text-emerald-500/10 group-hover/kpi:text-emerald-500/20 transition-colors pointer-events-none">
+                    <svg class="w-12 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7c0 1.66-4 3-9 3S2 8.66 2 7s4-3 9-3 9 1.34 9 3zM2 7v10c0 1.66 4 3 9 3s9-1.34 9-3V7M2 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+                    </svg>
+                </div>
+                <div class="text-xs font-medium text-slate-400 flex items-center justify-between">
+                    <span>Coste Total</span>
+                    <!-- Icono Ayuda Contextual -->
+                    <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-content absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                            <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                            Suma acumulada del coste de adquisición del hardware (<span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mtext>total</mtext></msub><mo>=</mo><mo>∑</mo><msub><mi>Q</mi><mi>i</mi></msub><mo>×</mo><msub><mi>P</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">C_{\text{total}} = \sum Q_i \times P_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.8333em; vertical-align: -0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.0715em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mop op-symbol small-op" style="position: relative; top: 0em;">∑</span><span class="mspace" style="margin-right: 0.1667em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3117em;"><span class="" style="top: -2.55em; margin-left: 0em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 0.8333em; vertical-align: -0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3117em;"><span class="" style="top: -2.55em; margin-left: -0.1389em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span></span></span></span></span> / C_total = ∑ Q_i × P_i).
+                            <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                            Negociar precios por volumen de compra, validar segundas fuentes (*second sources*) para el MCU u otros *cost drivers* o simplificar etapas analógicas complejas.
+                            <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                        </span>
+                    </span>
+                </div>
+                <div id="kpiTotalCost" class="text-2xl font-extrabold text-white mt-2">0,00</div>
+                <div class="text-[10px] text-emerald-400 mt-2 flex items-center gap-1">
+                    <span class="flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                   <!-- <span>Cálculo dinámico en tiempo real</span>-->
+                </div>
+            </div>
+
+            <!-- Cantidad Total de Componentes -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 relative group/kpi">
+                <div class="absolute top-0 right-0 p-4 text-blue-500/10 group-hover/kpi:text-blue-500/20 transition-colors pointer-events-none">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <div class="text-xs font-medium text-slate-400 flex items-center justify-between">
+                    <span>Cantidad Total</span>
+                    <!-- Icono Ayuda Contextual -->
+                    <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-content absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                            <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                            Cantidad física agregada de componentes soldados en la placa (PCBA).
+                            <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                            Consolidar funciones reduciendo el número de componentes pasivos (ej. optimizar redes de filtrado redundantes) o integrar subsistemas de acondicionamiento de señal en circuitos integrados multicanal.
+                            <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                        </span>
+                    </span>
+                </div>
+                <div id="kpiTotalQty" class="text-2xl font-extrabold text-white mt-2">0</div>
+                <div class="text-[10px] text-slate-400 mt-2 flex items-center gap-1">
+                    <span>Suma de cantidades físicas</span>
+                </div>
+            </div>
+
+            <!-- Part Numbers Únicos -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 relative group/kpi">
+                <div class="absolute top-0 right-0 p-4 text-indigo-500/10 group-hover/kpi:text-indigo-500/20 transition-colors pointer-events-none">
+                    <svg class="w-12 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <div class="text-xs font-medium text-slate-400 flex items-center justify-between">
+                    <span>PNs Únicos</span>
+                    <!-- Icono Ayuda Contextual -->
+                    <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-content absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                            <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                            Cantidad de códigos o números de parte únicos del fabricante gestionados en inventario.
+                            <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                            Estandarizar componentes, por ejemplo, utilizando la misma resistencia de pull-up de <span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><mtext>&nbsp;k</mtext><mi mathvariant="normal">Ω</mi></mrow><annotation encoding="application/x-tex">10\text{ k}\Omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mord">10</span><span class="mord text"><span class="mord">&nbsp;k</span></span><span class="mord">Ω</span></span></span></span></span> en múltiples circuitos en lugar de mezclar valores similares como <span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>8.2</mn><mtext>&nbsp;k</mtext><mi mathvariant="normal">Ω</mi></mrow><annotation encoding="application/x-tex">8.2\text{ k}\Omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mord">8.2</span><span class="mord text"><span class="mord">&nbsp;k</span></span><span class="mord">Ω</span></span></span></span></span> o <span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>12</mn><mtext>&nbsp;k</mtext><mi mathvariant="normal">Ω</mi></mrow><annotation encoding="application/x-tex">12\text{ k}\Omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mord">12</span><span class="mord text"><span class="mord">&nbsp;k</span></span><span class="mord">Ω</span></span></span></span></span>.
+                            <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                        </span>
+                    </span>
+                </div>
+                <div id="kpiUniquePNs" class="text-2xl font-extrabold text-white mt-2">0</div>
+                <div class="text-[10px] text-slate-400 mt-2 flex items-center gap-1">
+                    <span>Referencias en inventario</span>
+                </div>
+            </div>
+
+            <!-- Ratio de Diversidad de Resistencias -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 relative group/kpi">
+                <div class="absolute top-0 right-0 p-4 text-violet-500/10 group-hover/kpi:text-violet-500/20 transition-colors pointer-events-none">
+                    <!-- Icono Resistencia SMT -->
+                    <svg class="w-12 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12h3l2-4 3 8 2-6 2 4h3"></path>
+                    </svg>
+                </div>
+                <div class="text-xs font-medium text-slate-400 flex items-center justify-between">
+                    <span>Ratio Diversidad R</span>
+                    <!-- Icono Ayuda Contextual -->
+                    <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-content absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                            <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                            Relación entre números de parte de resistencias únicas (<span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mtext>resistencias</mtext></msub></mrow><annotation encoding="application/x-tex">U_{\text{resistencias}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.8333em; vertical-align: -0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3175em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">resistencias</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span></span></span></span></span>) y cantidad total física de resistencias (<span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext>total_resistencias</mtext></msub></mrow><annotation encoding="application/x-tex">N_{\text{total\_resistencias}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1.0503em; vertical-align: -0.367em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total_resistencias</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.367em;"><span class=""></span></span></span></span></span></span></span></span></span></span>):
+                            <span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>R</mi><mrow><mi>D</mi><mo separator="true">,</mo><mi>R</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>U</mi><mtext>resistencias</mtext></msub><msub><mi>N</mi><mtext>total_resistencias</mtext></msub></mfrac></mrow><annotation encoding="application/x-tex">R_{D, R} = \frac{U_{\text{resistencias}}}{N_{\text{total\_resistencias}}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.9694em; vertical-align: -0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3283em;"><span class="" style="top: -2.55em; margin-left: -0.0077em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right: 0.0278em;">D</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right: 0.0077em;">R</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.2861em;"><span class=""></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 2.4133em; vertical-align: -1.053em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 1.3603em;"><span class="" style="top: -2.314em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total_resistencias</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.367em;"><span class=""></span></span></span></span></span></span></span></span><span class="" style="top: -3.23em;"><span class="pstrut" style="height: 3em;"></span><span class="frac-line" style="border-bottom-width: 0.04em;"></span></span><span class="" style="top: -3.677em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3175em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">resistencias</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 1.053em;"><span class=""></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span>
+                            Unicode: R_D,R = U_resistencias / N_total_resistencias.
+                            <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                            Consolidar valores nominales a la serie estándar E24 o E96. Un ratio <span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mrow><mi>D</mi><mo separator="true">,</mo><mi>R</mi></mrow></msub><mo>≤</mo><mn>0.4</mn></mrow><annotation encoding="application/x-tex">R_{D, R} \le 0.4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.9694em; vertical-align: -0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3283em;"><span class="" style="top: -2.55em; margin-left: -0.0077em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right: 0.0278em;">D</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right: 0.0077em;">R</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.2861em;"><span class=""></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6444em;"></span><span class="mord">0.4</span></span></span></span></span> representa un excelente nivel de estandarización.
+                            <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                        </span>
+                    </span>
+                </div>
+                <div id="kpiDiversityRatioR" class="text-2xl font-extrabold text-white mt-2">0.000</div>
+                <div class="text-[10px] text-slate-400 mt-2 flex items-center gap-1" id="kpiDiversityRatingR"><span class="flex h-1.5 w-1.5 rounded-full bg-slate-500"></span><span>Sin resistencias</span></div>
+            </div>
+
+            <!-- Ratio de Diversidad de Condensadores -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 relative group/kpi">
+                <div class="absolute top-0 right-0 p-4 text-blue-500/10 group-hover/kpi:text-blue-500/20 transition-colors pointer-events-none">
+                    <!-- Icono Condensador SMT -->
+                    <svg class="w-12 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12h6m0-6v12m4-12v12m0-6h6"></path>
+                    </svg>
+                </div>
+                <div class="text-xs font-medium text-slate-400 flex items-center justify-between">
+                    <span>Ratio Diversidad C</span>
+                    <!-- Icono Ayuda Contextual -->
+                    <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-content absolute bottom-full right-0 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                            <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                            Relación entre números de parte de condensadores únicos (<span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mtext>condensadores</mtext></msub></mrow><annotation encoding="application/x-tex">U_{\text{condensadores}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.8333em; vertical-align: -0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">condensadores</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span></span></span></span></span>) y cantidad total física de condensadores (<span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext>total_condensadores</mtext></msub></mrow><annotation encoding="application/x-tex">N_{\text{total\_condensadores}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1.0503em; vertical-align: -0.367em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total_condensadores</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.367em;"><span class=""></span></span></span></span></span></span></span></span></span></span>):
+                            <span><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>R</mi><mrow><mi>D</mi><mo separator="true">,</mo><mi>C</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>U</mi><mtext>condensadores</mtext></msub><msub><mi>N</mi><mtext>total_condensadores</mtext></msub></mfrac></mrow><annotation encoding="application/x-tex">R_{D, C} = \frac{U_{\text{condensadores}}}{N_{\text{total\_condensadores}}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.9694em; vertical-align: -0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right: 0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3283em;"><span class="" style="top: -2.55em; margin-left: -0.0077em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right: 0.0278em;">D</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right: 0.0715em;">C</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.2861em;"><span class=""></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 2.4133em; vertical-align: -1.053em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 1.3603em;"><span class="" style="top: -2.314em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total_condensadores</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.367em;"><span class=""></span></span></span></span></span></span></span></span><span class="" style="top: -3.23em;"><span class="pstrut" style="height: 3em;"></span><span class="frac-line" style="border-bottom-width: 0.04em;"></span></span><span class="" style="top: -3.677em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right: 0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.3361em;"><span class="" style="top: -2.55em; margin-left: -0.109em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">condensadores</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 1.053em;"><span class=""></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span>
+                            Unicode: R_D,C = U_condensadores / N_total_condensadores.
+                            <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                            Consolidar encapsulados físicos (footprints) y estandarizar valores de capacidad para desacoplos a un único valor (ej. 100nF y 10uF).
+                            <span class="absolute top-full right-2 border-4 border-transparent border-t-slate-900"></span>
+                        </span>
+                    </span>
+                </div>
+                <div id="kpiDiversityRatioC" class="text-2xl font-extrabold text-white mt-2">0.000</div>
+                <div class="text-[10px] text-slate-400 mt-2 flex items-center gap-1" id="kpiDiversityRatingC"><span class="flex h-1.5 w-1.5 rounded-full bg-slate-500"></span><span>Sin condensadores</span></div>
+            </div>
+        </div>
+
+        <!-- GRÁFICOS DE DISTRIBUCIÓN -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Costes por Módulo -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider">Distribución por Módulo</h3>
+                        <!-- Icono Ayuda Contextual -->
+                        <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-content absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                Representación del peso económico porcentual de cada subsistema principal en el coste total del inversor.
+                                <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                Identificar el bloque que consume la mayor porción del presupuesto (ej: `Power supply` o `Main`) para dirigir las auditorías de diseño prioritariamente a ese módulo.
+                                <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                            </span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">Contribución relativa del coste total acumulado</p>
+                </div>
+                <div class="relative h-[250px] w-full flex items-center justify-center">
+                    <canvas id="moduleChart" width="456" height="250" style="display: block; box-sizing: border-box; height: 250px; width: 456.7px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Costes por Submódulo -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider">Distribución por Submódulo</h3>
+                        <!-- Icono Ayuda Contextual -->
+                        <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                Desglose económico de los subcircuitos funcionales pertenecientes al módulo seleccionado en los filtros.
+                                <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                Rediseñar o re-esquematizar las secciones internas críticas (ej. blocks de sensado o reguladores lineales redundantes) mediante topologías más sencillas o integradas.
+                                <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                            </span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">Comparativa de bloques funcionales (subcircuitos del módulo seleccionado)</p>
+                </div>
+                <div class="relative h-[250px] w-full flex items-center justify-center">
+                    <canvas id="submoduleChart" width="456" height="250" style="display: block; box-sizing: border-box; height: 250px; width: 456.7px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Curva de Pareto (80/20) -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider">Análisis de Pareto (80/20)</h3>
+                        <!-- Icono Ayuda Contextual -->
+                        <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-content absolute bottom-full right-0 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                Gráfico que ordena las referencias de mayor a menor coste consolidado y traza la curva de contribución acumulada.
+                                <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                Aplicar la ley de Pareto: enfocar el esfuerzo de ingeniería en optimizar el "20% de las referencias de compras unificadas que representan el 80% del coste" para maximizar la rentabilidad del desarrollo.
+                                <span class="absolute top-full right-2 border-4 border-transparent border-t-slate-900"></span>
+                            </span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">Concentración de coste por componentes unificados (módulo y submódulo seleccionados)</p>
+                </div>
+                <div class="relative h-[250px] w-full flex items-center justify-center">
+                    <canvas id="paretoChart" width="456" height="250" style="display: block; box-sizing: border-box; height: 250px; width: 456.7px; cursor: pointer;"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ANALISIS AUTOMATIZADO Y OPORTUNIDADES DE REDUCCIÓN DE COSTES (DTC) -->
+        <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                <span class="text-amber-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </span>
+                <span>Análisis Automatizado y Oportunidades de Reducción de Costes (DTC)</span>
+            </h3>
+
+            <!-- Grid de 4 columnas para hospedar las 4 métricas de optimización -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="alertsContainer"><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-rose-900/40 bg-rose-950/20 text-rose-300">
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-semibold text-white">
+                                <h4 class="text-xs font-bold uppercase tracking-wider">Tolerancias Más Costosas</h4>
+                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
+                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                        Componentes pasivos de precisión de alta exigencia que incrementan significativamente el coste directo de materiales.
+                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                        Auditar el circuito para verificar si los requerimientos de tolerancia pueden ser flexibilizados a valores comerciales estándar (ej. unificar a 1% en resistencias generales o 20% en condensadores).
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">5 ref.</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">Pasivos con tolerancias estrechas: Resistencias &lt; 5%, condensadores no electrolíticos &lt; 10% y electrolíticos &lt; 20%.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
+                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
+                        <button onclick="toggleDTCFilter('TOLERANCIAS_COSTOSAS')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
+                            Ver
+                        </button>
+                    </div>
+                </div><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-violet-900/40 bg-violet-950/20 text-violet-300">
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-semibold text-white">
+                                <h4 class="text-xs font-bold uppercase tracking-wider">Encapsulados Resistencias</h4>
+                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
+                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                        Diversidad de empaques geométricos (ej: 0402, 0603, 0805, 1206) presentes únicamente dentro de la familia de resistencias.
+                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                        Unificar los formatos superficiales (por ejemplo, estandarizar a empaque 0603 en lugar de mezclar 0402, 0603 y 0805) para reducir costes de configuración de máquina de colocación (*pick-and-place*).
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">5 ref.</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de resistencias (Rxx).</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
+                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
+                        <button onclick="toggleDTCFilter('ENCAPSULADOS_RESISTORES')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
+                            Ver
+                        </button>
+                    </div>
+                </div><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-blue-900/40 bg-blue-950/20 text-blue-300">
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-semibold text-white">
+                                <h4 class="text-xs font-bold uppercase tracking-wider">Encapsulados Condensadores</h4>
+                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
+                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                        Métrica de distribución geométrica y empaques físicos del conjunto de capacitores de desacoplo y filtrado cerámicos o electrolíticos.
+                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                        Consolidar empaques físicos hacia tamaños estándar unificados que satisfagan el voltaje nominal máximo y la rigidez dieléctrica requerida.
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">4 ref.</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de condensadores (Cxx).</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
+                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
+                        <button onclick="toggleDTCFilter('ENCAPSULADOS_CAPACITORES')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
+                            Ver
+                        </button>
+                    </div>
+                </div><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-emerald-900/40 bg-emerald-950/20 text-emerald-300">
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-semibold text-white">
+                                <h4 class="text-xs font-bold uppercase tracking-wider">Dieléctricos C0G/NP0</h4>
+                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
+                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                        Condensadores que usan dieléctricos C0G o NP0 por su deriva térmica casi nula y coeficiente de disipación de alta estabilidad.
+                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                        Sustituir por dieléctricos de Clase 2 (X7R o X5R) en líneas de acoplo, filtrado o desacoplo de alimentación general donde la deriva de capacidad con la temperatura no sea crítica.
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">0 ref.</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">Filtra condensadores que implementan dieléctricos cerámicos de Clase 1 (ultra-estabilidad térmica y baja disipación).</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
+                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
+                        <button onclick="toggleDTCFilter('DIELECTRICOS_COSTOSOS')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
+                            Ver
+                        </button>
+                    </div>
+                </div></div>
+        </div>
+
+        <!-- TABLA DE COMPONENTES E INTERFAZ WHAT-IF -->
+        <div class="bg-slate-900/40 border border-slate-800 rounded-xl flex flex-col">
+            
+            <!-- Barra de Herramientas de la Tabla -->
+            <div class="p-5 border-b border-slate-800 bg-slate-900/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-sm font-semibold text-white">Inspección de Materiales y Simulación What-If</h3>
+                    <p class="text-xs text-slate-400">Edite los costes unitarios directamente en la tabla para recalcular de inmediato el impacto en el sistema</p>
+                </div>
+                
+                <!-- Buscador e interruptores de filtrado -->
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" id="tableSearch" placeholder="Buscar por referencia, descripción..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none transition-colors">
+                    </div>
+
+                    <!-- Desplegable Módulos Multi-select -->
+                    <div class="relative inline-block text-left select-none" id="moduleFilterContainer">
+                        <button type="button" id="moduleFilterBtn" class="flex items-center justify-between gap-2 px-3 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none cursor-pointer transition-colors min-w-[160px]">
+                            <span id="moduleFilterLabel" class="truncate">Todos los Módulos</span>
+                            <svg class="w-4 h-4 text-slate-500 shrink-0 transition-transform duration-200" id="moduleFilterArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="moduleFilterDropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-950 border border-slate-800 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur p-2 space-y-1" style="right: 0 !important; left: auto !important;">
+                            <div class="flex items-center justify-between px-2 py-1.5 text-[10px] text-slate-400 border-b border-slate-900 mb-1">
+                                <button type="button" onclick="selectAllModules(true)" class="hover:text-white font-bold transition-colors">Todos</button>
+                                <button type="button" onclick="selectAllModules(false)" class="hover:text-white font-bold transition-colors">Ninguno</button>
+                            </div>
+                            <div id="moduleFilterOptions" class="max-h-48 overflow-y-auto space-y-0.5">
+                                <!-- Dinámico -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desplegable Submódulos Multi-select -->
+                    <div class="relative inline-block text-left select-none" id="submoduleFilterContainer">
+                        <button type="button" id="submoduleFilterBtn" class="flex items-center justify-between gap-2 px-3 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none cursor-pointer transition-colors min-w-[170px]">
+                            <span id="submoduleFilterLabel" class="truncate">Todos los Submódulos</span>
+                            <svg class="w-4 h-4 text-slate-500 shrink-0 transition-transform duration-200" id="submoduleFilterArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="submoduleFilterDropdown" class="hidden absolute right-0 mt-2 w-64 bg-slate-950 border border-slate-800 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur p-2 space-y-1" style="right: 0 !important; left: auto !important;">
+                            <div class="flex items-center justify-between px-2 py-1.5 text-[10px] text-slate-400 border-b border-slate-900 mb-1">
+                                <button type="button" onclick="selectAllSubmodules(true)" class="hover:text-white font-bold transition-colors">Todos</button>
+                                <button type="button" onclick="selectAllSubmodules(false)" class="hover:text-white font-bold transition-colors">Ninguno</button>
+                            </div>
+                            <div id="submoduleFilterOptions" class="max-h-48 overflow-y-auto space-y-0.5">
+                                <!-- Dinámico -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Datos -->
+            <div class="overflow-x-auto w-full rounded-b-xl">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900/60 text-slate-400 font-semibold border-b border-slate-800 text-xs uppercase tracking-wider select-none">
+                            <th class="px-6 py-4 text-center w-28">
+                                <div class="flex flex-col items-center gap-1.5 justify-center">
+                                    <span>Excluir</span>
+                                    <input type="checkbox" id="excluirTodosHeaderCheckbox" class="rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500 focus:ring-offset-slate-950 w-4 h-4 cursor-pointer" onchange="toggleExcluirTodos(this.checked)" title="Excluir o incluir todos los componentes">
+                                </div>
+                            </th>
+                            <th class="px-6 py-4">Designador</th>
+                            <th class="px-6 py-4">Descripción</th>
+                            <th class="px-6 py-4 text-center">Cant. (Q_i)</th>
+                            <th class="px-6 py-4">Fabricante</th>
+                            <th class="px-6 py-4">Part Number</th>
+                            <th class="px-6 py-4">Coste Unitario</th>
+                            <th class="px-6 py-4 text-right">Coste Total</th>
+                            <th class="px-6 py-4">Módulo</th>
+                            <th class="px-6 py-4">Submódulo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bomTableBody" class="divide-y divide-slate-800/50 bg-slate-900/10"></tbody>
+                </table>
+            </div>
+
+            <!-- Resumen de registros visibles -->
+            <div class="px-6 py-4 bg-slate-900/20 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <div class="flex items-center gap-3"> 
+                    <span>Mostrando <span id="visibleCount" class="text-slate-200 font-medium">13</span> de <span id="totalCount" class="text-slate-200 font-medium">13</span> componentes</span>
+                    <!-- Badge del filtro de auditoría DTC activo -->
+                    <span id="dtcActiveBadge" class="hidden px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold flex items-center gap-1.5 animate-pulse text-[10px] uppercase tracking-wider">
+                        <span id="dtcActiveBadgeText">Filtro DTC Activo</span>
+                        <button onclick="clearDTCFilter()" class="hover:text-amber-200 font-extrabold ml-1 text-xs">×</button>
+                    </span>
+                    <!-- Badge del filtro de Pareto activo -->
+                    <span id="paretoActiveBadge" class="hidden px-2.5 py-1 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold flex items-center gap-1.5 animate-pulse text-[10px] uppercase tracking-wider">
+                        <span id="paretoActiveBadgeText">Filtro Pareto Activo</span>
+                        <button onclick="clearParetoFilter()" class="hover:text-teal-200 font-extrabold ml-1 text-xs">×</button>
+                    </span>
+                </div>
+                <div class="text-slate-500">Haga clic en el campo 'Coste Unitario' para editarlo o en las barras de Pareto para filtrar.</div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-4 px-6 text-center text-xs text-slate-500 shrink-0">
+        Diseño y optimización DTC de electrónica de potencia. Todos los cálculos se efectúan localmente en el motor de renderizado del navegador.
+    </footer>
+
+    <!-- LÓGICA DE NEGOCIO Y CONTROL EN JAVASCRIPT -->
+    <script>
+        // BOM POR DEFECTO AJUSTADA EXCLUSIVAMENTE CON ELEMENTOS DEL REAL '.CSV'
+        const defaultBOM_CSV = `Designator;Description;Quantity;Manufacturer;PartNumber;Unit Price;Total Price;Modulo;SubModulo;Modelo;
+U6;CI de autenticacion, seguridad estado del arte para perifericos e IoT, interface I2C, SO8 (ST);1;ST;STSAFA110S8SPL02;US$1,5000;US$1,5000;MainBoard;CRA;Not_model_defined;
+PCB1;FR-4 Mid-Tg (150°C), 1.6mm. 1oz, HASL(LF), Black solder, White silkscreen, 4L, 170mm x 100mm;1;;;US$0,0000;US$0,0000;MainBoard;COMUN;Not_model_defined;
+C2;Condensador 1uF, 50V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KB8NQNC;US$0,0200;US$0,0200;MainBoard;3V3P;Not_model_defined;
+C4;Condensador 1uF, 50V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KB8NQNC;US$0,0200;US$0,0200;MainBoard;3V3P;Not_model_defined;
+C27;Condensador 1uF, 50V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KB8NQNC;US$0,0200;US$0,0200;MainBoard;3V3P;Not_model_defined;
+C28;Condensador 10uF, 16V, 10%, X5R, 0805;1;MURATA;GRM21BR61C106KE15L;US$0,0500;US$0,0500;MainBoard;3V3P;Not_model_defined;
+R32;Resistencia 10K, 1%, 100mW, 0603;1;VISHAY;CRCW060310K0FKEB;US$0,1000;US$0,1000;PowerSupply;IPM_CURR;Not_model_defined;
+R50;Resistencia 20K, 1%, 100mW, 0603;1;VISHAY;CRCW060320K0FKEA;US$0,1000;US$0,1000;PowerSupply;IPM_TEMP;Not_model_defined;
+R16, R17, R18, R19, R20, R21, R22;Resistencia 22R, 1%, 330mW, 0603;7;VISHAY;CRCW060322R0FKEAHP;US$0,1000;US$0,7000;PowerSupply;COMUN;Not_model_defined;
+R30;Resistencia 100R, 1%, 100mW, 0603;1;VISHAY;CRCW0603100RFKEA;US$0,1000;US$0,1000;PowerSupply;IPM_CURR;Not_model_defined;
+R35, R36;Resistencia 4K7, 1%, 100mW, 0603;2;YAGEO;RC0603FR-074K7L;US$0,0150;US$0,0300;MainBoard;COMUN;Not_model_defined;
+U1;Microcontrolador de señal mixta 32-bit Cortex-M4;1;ST;STM32G474RET6;US$4,5000;US$4,5000;MainBoard;MCU;Not_model_defined;
+U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,8500;MainBoard;COMUN;Not_model_defined;`;
+
+        // ESTADO GLOBAL DE LA APLICACIÓN
+        let bomData = [];
+        let chartInstances = {};
+        let activeDTCFilter = null; // Filtro activo ('TOLERANCIAS_COSTOSAS', 'ENCAPSULADOS_RESISTORES', 'ENCAPSULADOS_CAPACITORES', 'DIELECTRICOS_COSTOSOS')
+        let activeParetoFilter = null; // Almacena la referencia consolidada clicada en Pareto
+        let currentParetoVisibleItems = []; // Listado de referencias consolidadas visibles en el Pareto actual (máx 10)
+        let selectedModules = [];
+        let selectedSubmodules = [];
+
+        // INICIALIZACIÓN
+        window.addEventListener('DOMContentLoaded', () => {
+            inicializarApp("", "Ningún archivo cargado");
+            configurarEventos();
+        });
+
+        // DISPARO DINÁMICO DE RENDERIZACIÓN DE EXPRESIONES MATEMÁTICAS (KaTeX)
+        function triggerMathRender() {
+            if (typeof renderMathInElement !== 'undefined') {
+                try {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ]
+                    });
+                } catch (e) {
+                    console.error("Error al renderizar ecuaciones matemáticas con KaTeX:", e);
+                }
+            }
+        }
+
+        // NOTIFICADOR VISUAL AL USUARIO (TOAST)
+        function mostrarToast(mensaje, esExito = true) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            if (!toast || !toastIcon || !toastMessage) return;
+
+            toastMessage.textContent = mensaje;
+            if (esExito) {
+                toastIcon.innerHTML = `<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                toast.className = toast.className.replace('border-rose-900', 'border-slate-700').replace('bg-rose-950/20', 'bg-slate-900');
+            } else {
+                toastIcon.innerHTML = `<svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+                toast.className = toast.className.replace('border-slate-700', 'border-rose-900').replace('bg-slate-900', 'bg-rose-950/20');
+            }
+
+            toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+            }, 4000);
+        }
+
+        // CONTROLADOR INTERACTIVO DE EXCLUSIÓN MUTUA PARA TOOLTIPS (Soporte mobile click y de-focus click)
+        function toggleTooltip(event, element) {
+            event.stopPropagation();
+            const tooltip = element.querySelector('.tooltip-content');
+            if (!tooltip) return;
+            const isCurrentlyShown = tooltip.classList.contains('opacity-100');
+            
+            // Ocultar todas las burbujas activas en el viewport
+            document.querySelectorAll('.tooltip-content').forEach(el => {
+                el.classList.add('opacity-0', 'pointer-events-none');
+                el.classList.remove('opacity-100', 'pointer-events-auto');
+            });
+            
+            // Alternar estado de la burbuja seleccionada
+            if (!isCurrentlyShown) {
+                tooltip.classList.remove('opacity-0', 'pointer-events-none');
+                tooltip.classList.add('opacity-100', 'pointer-events-auto');
+                triggerMathRender();
+            }
+        }
+
+        // CONTROL DE INTERFACES INTERACTIVAS DE ALTERNANCIA DTC (VER/QUITAR FILTRO)
+        function toggleDTCFilter(filterType) {
+            if (activeDTCFilter === filterType) {
+                activeDTCFilter = null;
+                mostrarToast("Filtro DTC desactivado.");
+            } else {
+                activeDTCFilter = filterType;
+                let nombreFiltro = "";
+                if (filterType === 'TOLERANCIAS_COSTOSAS') nombreFiltro = "Tolerancias más costosas";
+                if (filterType === 'ENCAPSULADOS_RESISTORES') nombreFiltro = "Encapsulados de resistencias";
+                if (filterType === 'ENCAPSULADOS_CAPACITORES') nombreFiltro = "Encapsulados de condensadores";
+                if (filterType === 'DIELECTRICOS_COSTOSOS') nombreFiltro = "Dieléctricos más costosos (C0G/NP0)";
+                mostrarToast(`Filtrando por: ${nombreFiltro}`);
+            }
+            
+            ejecutarAlertasDTC();
+            filtrarYRenderizarTabla();
+        }
+
+        // LIMPIEZA DEL FILTRO DTC DESDE EL BADGE DE LA TABLA
+        function clearDTCFilter() {
+            activeDTCFilter = null;
+            ejecutarAlertasDTC();
+            filtrarYRenderizarTabla();
+            mostrarToast("Filtro DTC desactivado.");
+        }
+
+        function openHelpModal() {
+            const modal = document.getElementById('helpModal');
+            const card = document.getElementById('helpModalCard');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+        }
+
+        function closeHelpModal() {
+            const modal = document.getElementById('helpModal');
+            const card = document.getElementById('helpModalCard');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
+        }
+
+        // CONFIGURACIÓN DE ESCUCHADORES DE EVENTOS
+        function configurarEventos() {
+            // Carga de archivo CSV local
+            const fileInput = document.getElementById('csvFileInput');
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    inicializarApp(event.target.result, `BOM: ${file.name}`);
+                    mostrarToast("Archivo cargado y procesado con éxito.");
+                };
+                reader.readAsText(file);
+            });
+
+            // Botón de exportación a CSV optimizado
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                if (bomData.length === 0) {
+                    mostrarToast("No hay datos para exportar.", false);
+                    return;
+                }
+                let csvContent = "Designator;Description;Quantity;Manufacturer;PartNumber;Unit Price;Total Price;Modulo;SubModulo;Modelo;\r\n";
+                bomData.forEach(item => {
+                    if (item.excluido) return;
+                    const uPrice = item.unitPrice.toFixed(4).replace('.', ',');
+                    const tPrice = item.totalPrice.toFixed(4).replace('.', ',');
+                    csvContent += `"${item.designator}";"${item.description}";${item.quantity};"${item.manufacturer}";"${item.partNumber}";${uPrice};${tPrice};"${item.modulo}";"${item.submodulo}";"${item.modelo}"\r\n`;
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", "BOM_optimizado.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                mostrarToast("BOM exportada correctamente a 'BOM_optimizado.csv'.");
+            });
+
+            // Botón para cargar BOM de ejemplo
+            document.getElementById('loadExampleBtn').addEventListener('click', () => {
+                inicializarApp(defaultBOM_CSV, 'BOM de Ejemplo.csv');
+                mostrarToast("Se ha cargado el BOM de ejemplo.");
+            });
+
+            // Botón de restablecer (ahora limpia)
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                inicializarApp("", "Ningún archivo cargado");
+                mostrarToast("Se han limpiado los datos del BOM.");
+            });
+
+            // Filtros de búsqueda y selectores
+            document.getElementById('tableSearch').addEventListener('input', filtrarYRenderizarTabla);
+            
+            // Abrir y cerrar desplegables
+            document.getElementById('moduleFilterBtn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dp = document.getElementById('moduleFilterDropdown');
+                const arrow = document.getElementById('moduleFilterArrow');
+                const isHidden = dp.classList.contains('hidden');
+                
+                document.getElementById('submoduleFilterDropdown').classList.add('hidden');
+                document.getElementById('submoduleFilterArrow').classList.remove('rotate-180');
+
+                if (isHidden) {
+                    dp.classList.remove('hidden');
+                    arrow.classList.add('rotate-180');
+                } else {
+                    dp.classList.add('hidden');
+                    arrow.classList.remove('rotate-180');
+                }
+            });
+
+            document.getElementById('submoduleFilterBtn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dp = document.getElementById('submoduleFilterDropdown');
+                const arrow = document.getElementById('submoduleFilterArrow');
+                const isHidden = dp.classList.contains('hidden');
+                
+                document.getElementById('moduleFilterDropdown').classList.add('hidden');
+                document.getElementById('moduleFilterArrow').classList.remove('rotate-180');
+
+                if (isHidden) {
+                    dp.classList.remove('hidden');
+                    arrow.classList.add('rotate-180');
+                } else {
+                    dp.classList.add('hidden');
+                    arrow.classList.remove('rotate-180');
+                }
+            });
+
+            // Cerrar desplegables al hacer clic fuera o pulsar Esc
+            document.addEventListener('click', (e) => {
+                const modCont = document.getElementById('moduleFilterContainer');
+                const subCont = document.getElementById('submoduleFilterContainer');
+                
+                if (modCont && !modCont.contains(e.target)) {
+                    document.getElementById('moduleFilterDropdown').classList.add('hidden');
+                    document.getElementById('moduleFilterArrow').classList.remove('rotate-180');
+                }
+                if (subCont && !subCont.contains(e.target)) {
+                    document.getElementById('submoduleFilterDropdown').classList.add('hidden');
+                    document.getElementById('submoduleFilterArrow').classList.remove('rotate-180');
+                }
+            });
+
+            document.getElementById('helpBtn').addEventListener('click', openHelpModal);
+
+            document.getElementById('helpModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('helpModal')) {
+                    closeHelpModal();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('moduleFilterDropdown').classList.add('hidden');
+                    document.getElementById('moduleFilterArrow').classList.remove('rotate-180');
+                    document.getElementById('submoduleFilterDropdown').classList.add('hidden');
+                    document.getElementById('submoduleFilterArrow').classList.remove('rotate-180');
+                    closeHelpModal();
+                }
+            });
+        }
+
+        // LIMPIEZA Y PARSEO DE CADENAS DE MONEDA
+        function parsearPrecio(str) {
+            if (!str) return 0;
+            let limpio = str.replace(/[^\d,.-]/g, '');
+            if (limpio.includes(',') && !limpio.includes('.')) {
+                limpio = limpio.replace(',', '.');
+            } else if (limpio.includes(',') && limpio.includes('.')) {
+                limpio = limpio.replace(/,/g, '');
+            }
+            const valor = parseFloat(limpio);
+            return isNaN(valor) ? 0 : valor;
+        }
+
+        // PARSER DEL COMPONENTE: CLASIFICACIÓN Y EXTRACCIÓN DE TOLERANCIAS NOMINALES
+        function obtenerToleranciaYTipo(item) {
+            const desc = item.description.toLowerCase();
+            const desig = item.designator.toUpperCase();
+            
+            const esResistor = desig.startsWith('R') || desc.includes('resistencia') || desc.includes('resistor');
+            const esCapacitor = desig.startsWith('C') || desc.includes('condensador') || desc.includes('capacitor');
+            
+            const match = desc.match(/([\d.,]+)\s*%/);
+            const tolVal = match ? parseFloat(match[1].replace(',', '.')) : null;
+
+            const esElectrolitico = esCapacitor && (desc.includes('electrolit') || desc.includes('aluminio') || desc.includes('elco') || desc.includes('tantal'));
+
+            return { esResistor, esCapacitor, esElectrolitico, tolVal };
+        }
+
+        // INTERPRETE DE CSV ROBUSTO PARA ENTORNOS CAD ELECTRONICOS
+        function procesarCSV(text) {
+            if (!text || text.trim() === "") {
+                document.getElementById('headerSeparator').textContent = "-";
+                document.getElementById('headerRowsCount').textContent = "0";
+                document.getElementById('headerFlattenRowsCount').textContent = "0";
+                return [];
+            }
+            const lineas = text.split(/\r?\n/).filter(line => line.trim() !== "");
+            if (lineas.length < 2) {
+                document.getElementById('headerSeparator').textContent = "-";
+                document.getElementById('headerRowsCount').textContent = "0";
+                document.getElementById('headerFlattenRowsCount').textContent = "0";
+                return [];
+            }
+
+            let delimitador = ';';
+            const cabecera = lineas[0];
+            if (cabecera.includes(',') && !cabecera.includes(';')) {
+                delimitador = ',';
+            }
+            document.getElementById('headerSeparator').textContent = delimitador === ';' ? "Punto y Coma (;)" : "Coma (,)";
+
+            const columnas = cabecera.split(delimitador).map(c => c.trim().toLowerCase().replace(/^"|"$/g, ''));
+            
+            const mapaCampos = {
+                designator: ['designator', 'refdes', 'referencia', 'componente'],
+                description: ['description', 'descripción', 'descrip', 'value', 'valor'],
+                quantity: ['quantity', 'qty', 'cantidad', 'cant'],
+                manufacturer: ['manufacturer', 'fabricante', 'mfg'],
+                partnumber: ['partnumber', 'pn', 'part number', 'referencia fabricante', 'mpn'],
+                unitprice: ['unit price', 'unitprice', 'precio unitario', 'precio_unit', 'coste unitario'],
+                totalprice: ['total price', 'totalprice', 'precio total', 'precio_total', 'coste total'],
+                modulo: ['modulo', 'módulo', 'module'],
+                submodulo: ['submodulo', 'submódulo', 'submodule'],
+                modelo: ['modelo', 'model']
+            };
+
+            const indices = {};
+            columnas.forEach((col, idx) => {
+                const colLimpia = col.replace(/[\s_]/g, '');
+                for (const [campo, variaciones] of Object.entries(mapaCampos)) {
+                    if (variaciones.some(v => {
+                        const vLimpia = v.replace(/[\s_]/g, '');
+                        if (campo === 'modulo' && (colLimpia.includes('sub') || colLimpia.includes('under'))) {
+                            return false;
+                        }
+                        return colLimpia.includes(vLimpia);
+                    })) {
+                        indices[campo] = idx;
+                    }
+                }
+            });
+
+            if (indices.designator === undefined) indices.designator = 0;
+            if (indices.description === undefined) indices.description = 1;
+            if (indices.quantity === undefined) indices.quantity = 2;
+            if (indices.unitprice === undefined) indices.unitprice = 5;
+            if (indices.modulo === undefined) indices.modulo = 7;
+            if (indices.submodulo === undefined) indices.submodulo = 8;
+
+            const datos = [];
+
+            for (let i = 1; i < lineas.length; i++) {
+                const linea = lineas[i].trim();
+                if (!linea) continue;
+
+                let celdas = [];
+                let dentroDeComillas = false;
+                let buffer = '';
+                
+                for (let k = 0; k < linea.length; k++) {
+                    const char = linea[k];
+                    if (char === '"') {
+                        dentroDeComillas = !dentroDeComillas;
+                    } else if (char === delimitador && !dentroDeComillas) {
+                        celdas.push(buffer.trim());
+                        buffer = '';
+                    } else {
+                        buffer += char;
+                    }
+                }
+                celdas.push(buffer.trim());
+
+                if (celdas.length < 3) continue;
+
+                const extraer = (campo) => {
+                    const idx = indices[campo];
+                    return idx !== undefined && idx < celdas.length ? celdas[idx].replace(/^"|"$/g, '').trim() : '';
+                };
+
+                const qty = parseInt(extraer('quantity')) || 1;
+                let unitPrice = parsearPrecio(extraer('unitprice'));
+                const totalPriceRaw = extraer('totalprice');
+
+                if ((unitPrice === 0 || !extraer('unitprice')) && totalPriceRaw) {
+                    const totalEst = parsearPrecio(totalPriceRaw);
+                    if (totalEst > 0) {
+                        unitPrice = totalEst / qty;
+                    }
+                }
+
+                const mod = extraer('modulo') || 'General';
+                const subMod = extraer('submodulo') || 'COMUN';
+                const modModelo = extraer('modelo');
+
+                const totalPriceParsed = totalPriceRaw ? parsearPrecio(totalPriceRaw) : (qty * unitPrice);
+
+                // Aplanado/Explode de designadores
+                const desigRaw = extraer('designator');
+                const designadoresList = desigRaw.split(',').map(d => d.trim()).filter(d => d !== '');
+
+                const crearFilaObjeto = (designadorStr, qtyVal, totalPriceVal) => {
+                    return {
+                        originalIndex: datos.length,
+                        excluido: false,
+                        designator: designadorStr,
+                        description: extraer('description'),
+                        quantity: qtyVal,
+                        manufacturer: extraer('manufacturer') || 'No especificado',
+                        partNumber: extraer('partnumber') || 'N/A',
+                        unitPrice: unitPrice,
+                        totalPrice: totalPriceVal,
+                        modulo: mod,
+                        submodulo: subMod,
+                        modelo: modModelo || 'N/A'
+                    };
+                };
+
+                if (designadoresList.length === 0) {
+                    // Si no hay designadores válidos, añadir la fila original tal cual
+                    datos.push(crearFilaObjeto(desigRaw, qty, totalPriceParsed));
+                } else if (designadoresList.length > 1) {
+                    // Si hay múltiples designadores (ej. C1, C2, C3), dividirlos en N filas de cantidad 1
+                    designadoresList.forEach(desig => {
+                        datos.push(crearFilaObjeto(desig, 1, unitPrice));
+                    });
+                } else {
+                    // Si hay exactamente 1 designador, pero cantidad > 1 (ej. C1 con qty 3)
+                    // lo aplanamos en 'qty' filas individuales de cantidad 1 para mantener el modelo aplanado
+                    if (qty > 1) {
+                        for (let q = 0; q < qty; q++) {
+                            datos.push(crearFilaObjeto(designadoresList[0], 1, unitPrice));
+                        }
+                    } else {
+                        // Fila simple de 1 componente
+                        datos.push(crearFilaObjeto(designadoresList[0], qty, totalPriceParsed));
+                    }
+                }
+            }
+
+            const originalRowsCount = lineas.length - 1;
+            document.getElementById('headerRowsCount').textContent = originalRowsCount;
+            document.getElementById('headerFlattenRowsCount').textContent = datos.length;
+
+            return datos;
+        }
+
+        // ORQUESTACIÓN DEL FLUJO DE DATOS
+        function inicializarApp(csvRaw, tituloBOM) {
+            const cleanTitle = tituloBOM.replace(/^BOM:\s*/, '');
+            document.getElementById('headerBomTitle').textContent = cleanTitle;
+            bomData = procesarCSV(csvRaw);
+            activeParetoFilter = null; // Restablecer filtro de Pareto
+            actualizarBadgePareto();
+            
+            const dot = document.getElementById('headerStatusDot');
+            if (bomData.length > 0) {
+                dot.className = "flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0";
+            } else {
+                dot.className = "flex h-2 w-2 rounded-full bg-slate-600 shrink-0";
+                document.getElementById('headerBomTitle').textContent = "Ninguno";
+                document.getElementById('headerSeparator').textContent = "-";
+                document.getElementById('headerRowsCount').textContent = "0";
+                document.getElementById('headerFlattenRowsCount').textContent = "0";
+            }
+            
+            poblarSelectoresDeFiltrado();
+            actualizarCalculosYVistas();
+        }
+
+        // ALTERNAR EXCLUSIÓN DE COMPONENTE EN LOS CÁLCULOS
+        function toggleExcluirComponente(originalIndex, isChecked) {
+            if (bomData[originalIndex]) {
+                bomData[originalIndex].excluido = isChecked;
+                actualizarCalculosYVistas();
+            }
+        }
+
+        // ALTERNAR EXCLUSIÓN DE TODOS LOS COMPONENTES
+        function toggleExcluirTodos(isChecked) {
+            bomData.forEach(item => {
+                item.excluido = isChecked;
+            });
+            actualizarCalculosYVistas();
+        }
+
+        // POBLAR SELECTORES DE FILTRADO DINÁMICAMENTE
+        function poblarSelectoresDeFiltrado() {
+            const modulos = [...new Set(bomData.map(item => item.modulo))].sort();
+            selectedModules = [...modulos];
+            renderModulesDropdown();
+            actualizarSelectorSubmodulos(true);
+        }
+
+        // RENDERIZAR OPCIONES DE MÓDULOS
+        function renderModulesDropdown() {
+            const container = document.getElementById('moduleFilterOptions');
+            container.innerHTML = '';
+            
+            const modulos = [...new Set(bomData.map(item => item.modulo))].sort();
+            
+            if (modulos.length === 0) {
+                container.innerHTML = '<div class="px-2 py-1.5 text-[11px] text-slate-500 text-center">Cargue un BOM</div>';
+                updateModuleLabel();
+                return;
+            }
+
+            modulos.forEach(mod => {
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-800/60 cursor-pointer text-xs transition-colors";
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = "checkbox";
+                checkbox.className = "rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-950 w-3.5 h-3.5";
+                checkbox.checked = selectedModules.includes(mod);
+                
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        if (!selectedModules.includes(mod)) selectedModules.push(mod);
+                    } else {
+                        selectedModules = selectedModules.filter(m => m !== mod);
+                    }
+                    updateModuleLabel();
+                    actualizarSelectorSubmodulos(true);
+                });
+                
+                const span = document.createElement('span');
+                span.className = "text-slate-300";
+                span.textContent = mod;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+            updateModuleLabel();
+        }
+
+        function updateModuleLabel() {
+            const label = document.getElementById('moduleFilterLabel');
+            const modulos = [...new Set(bomData.map(item => item.modulo))];
+            
+            if (modulos.length === 0) {
+                label.textContent = "Sin módulos";
+                return;
+            }
+
+            if (selectedModules.length === 0) {
+                label.textContent = "Ninguno";
+            } else if (selectedModules.length === modulos.length) {
+                label.textContent = "Todos los Módulos";
+            } else if (selectedModules.length === 1) {
+                label.textContent = selectedModules[0];
+            } else {
+                label.textContent = `${selectedModules.length} seleccionados`;
+            }
+        }
+
+        function selectAllModules(val) {
+            const modulos = [...new Set(bomData.map(item => item.modulo))];
+            if (val) {
+                selectedModules = [...modulos];
+            } else {
+                selectedModules = [];
+            }
+            renderModulesDropdown();
+            actualizarSelectorSubmodulos(true);
+        }
+
+        // ACTUALIZACIÓN DINÁMICA DEL SELECTOR DE SUBMÓDULOS (CASCADING DROPDOWN)
+        function actualizarSelectorSubmodulos(resetSubmodules = false) {
+            const container = document.getElementById('submoduleFilterOptions');
+            container.innerHTML = '';
+
+            let submodulosDisponibles = [];
+            if (selectedModules.length > 0) {
+                submodulosDisponibles = [...new Set(
+                    bomData.filter(item => selectedModules.includes(item.modulo)).map(item => item.submodulo)
+                )];
+            }
+            submodulosDisponibles.sort();
+
+            if (submodulosDisponibles.length === 0) {
+                container.innerHTML = '<div class="px-2 py-1.5 text-[11px] text-slate-500 text-center">Sin submódulos</div>';
+                selectedSubmodules = [];
+                updateSubmoduleLabel();
+                
+                activeParetoFilter = null;
+                actualizarBadgePareto();
+                filtrarYRenderizarTabla();
+                renderizarGraficos();
+                ejecutarAlertasDTC();
+				actualizarCalculosYVistas();
+                return;
+            }
+
+            if (resetSubmodules) {
+                selectedSubmodules = [...submodulosDisponibles];
+            } else {
+                selectedSubmodules = selectedSubmodules.filter(sub => submodulosDisponibles.includes(sub));
+            }
+
+            submodulosDisponibles.forEach(sub => {
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-800/60 cursor-pointer text-xs transition-colors";
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = "checkbox";
+                checkbox.className = "rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-950 w-3.5 h-3.5";
+                checkbox.checked = selectedSubmodules.includes(sub);
+                
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        if (!selectedSubmodules.includes(sub)) selectedSubmodules.push(sub);
+                    } else {
+                        selectedSubmodules = selectedSubmodules.filter(s => s !== sub);
+                    }
+                    updateSubmoduleLabel();
+                    
+                    activeParetoFilter = null;
+                    actualizarBadgePareto();
+                    filtrarYRenderizarTabla();
+                    renderizarGraficos();
+                    ejecutarAlertasDTC();
+                });
+                
+                const span = document.createElement('span');
+                span.className = "text-slate-300";
+                span.textContent = sub;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+
+            updateSubmoduleLabel();
+
+            activeParetoFilter = null;
+            actualizarBadgePareto();
+            filtrarYRenderizarTabla();
+            renderizarGraficos();
+            ejecutarAlertasDTC();
+        }
+
+        function updateSubmoduleLabel() {
+            const label = document.getElementById('submoduleFilterLabel');
+            let submodulosDisponibles = [];
+            if (selectedModules.length > 0) {
+                submodulosDisponibles = [...new Set(
+                    bomData.filter(item => selectedModules.includes(item.modulo)).map(item => item.submodulo)
+                )];
+            }
+            
+            if (submodulosDisponibles.length === 0) {
+                label.textContent = "Sin submódulos";
+                return;
+            }
+
+            if (selectedSubmodules.length === 0) {
+                label.textContent = "Ninguno";
+            } else if (selectedSubmodules.length === submodulosDisponibles.length) {
+                label.textContent = "Todos los Submódulos";
+            } else if (selectedSubmodules.length === 1) {
+                label.textContent = selectedSubmodules[0];
+            } else {
+                label.textContent = `${selectedSubmodules.length} seleccionados`;
+            }
+        }
+
+        function selectAllSubmodules(val) {
+            let submodulosDisponibles = [];
+            if (selectedModules.length > 0) {
+                submodulosDisponibles = [...new Set(
+                    bomData.filter(item => selectedModules.includes(item.modulo)).map(item => item.submodulo)
+                )];
+            }
+            if (val) {
+                selectedSubmodules = [...submodulosDisponibles];
+            } else {
+                selectedSubmodules = [];
+            }
+            actualizarSelectorSubmodulos(false);
+        }
+
+        // RE-CALCULAR MÉTRICAS, ACTUALIZAR GRÁFICOS Y TABLAS
+        function actualizarCalculosYVistas() {
+            calcularKPIs();
+            renderizarGraficos();
+            filtrarYRenderizarTabla();
+            ejecutarAlertasDTC();
+            triggerMathRender(); 
+        }
+
+        // CÁLCULO DE INDICADORES FINANCIEROS Y DE DISEÑO
+        function calcularKPIs() {
+            let totalCost = 0;
+            let totalQty = 0;
+            const uniquePNs = new Set();
+
+            // Variables de segregación para Resistencias (Rxx) y Condensadores (Cxx)
+            let resUnicos = new Set();
+            let resTotales = 0;
+            let capUnicos = new Set();
+            let capTotales = 0;
+
+            bomData.forEach(item => {
+                if (item.excluido) return;
+                
+                // Filtro por módulo y submódulo seleccionados
+                const cumpleMod = selectedModules.includes(item.modulo);
+                const cumpleSub = selectedSubmodules.includes(item.submodulo);
+                if (!cumpleMod || !cumpleSub) return;
+                
+                totalCost += item.totalPrice;
+                totalQty += item.quantity;
+                if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
+                    uniquePNs.add(item.partNumber);
+                }
+
+                const info = obtenerToleranciaYTipo(item);
+                if (info.esResistor) {
+                    resTotales += item.quantity;
+                    if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
+                        resUnicos.add(item.partNumber);
+                    }
+                } else if (info.esCapacitor) {
+                    capTotales += item.quantity;
+                    if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
+                        capUnicos.add(item.partNumber);
+                    }
+                }
+            });
+
+            // Asentamiento en interfaz de usuario de KPI generales
+            document.getElementById('kpiTotalCost').textContent = totalCost.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('kpiTotalQty').textContent = totalQty.toLocaleString('es-ES');
+            document.getElementById('kpiUniquePNs').textContent = uniquePNs.size.toString();
+
+            // Cálculo paramétrico del Ratio de Diversidad de Resistencias (R)
+            const r_d_r = resTotales > 0 ? (resUnicos.size / resTotales) : 0;
+            const kpiRatioR = document.getElementById('kpiDiversityRatioR');
+            const kpiRatingR = document.getElementById('kpiDiversityRatingR');
+            
+            kpiRatioR.textContent = r_d_r.toFixed(3);
+            if (resTotales === 0) {
+                kpiRatingR.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-slate-500"></span><span>Sin resistencias</span>`;
+            } else if (r_d_r <= 0.4) {
+                kpiRatingR.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span><span class="text-emerald-400">Excelente estandarización</span>`;
+            } else if (r_d_r <= 0.6) {
+                kpiRatingR.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-amber-400"></span><span class="text-amber-400">Moderado. Optimizar</span>`;
+            } else {
+                kpiRatingR.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-rose-500"></span><span class="text-rose-400">Alerta: Alta dispersión</span>`;
+            }
+
+            // Cálculo paramétrico del Ratio de Diversidad de Condensadores (C)
+            const r_d_c = capTotales > 0 ? (capUnicos.size / capTotales) : 0;
+            const kpiRatioC = document.getElementById('kpiDiversityRatioC');
+            const kpiRatingC = document.getElementById('kpiDiversityRatingC');
+
+            kpiRatioC.textContent = r_d_c.toFixed(3);
+            if (capTotales === 0) {
+                kpiRatingC.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-slate-500"></span><span>Sin condensadores</span>`;
+            } else if (r_d_c <= 0.4) {
+                kpiRatingC.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span><span class="text-emerald-400">Excelente estandarización</span>`;
+            } else if (r_d_c <= 0.6) {
+                kpiRatingC.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-amber-400"></span><span class="text-amber-400">Moderado. Optimizar</span>`;
+            } else {
+                kpiRatingC.innerHTML = `<span class="flex h-1.5 w-1.5 rounded-full bg-rose-500"></span><span class="text-rose-400">Alerta: Diversidad excesiva</span>`;
+            }
+        }
+
+        // GENERACIÓN Y ACTUALIZACIÓN DE GRÁFICOS (CHART.JS)
+        function renderizarGraficos() {
+            // 1. Datos para Módulos (Filtrado dinámicamente según los submódulos seleccionados)
+            const costesModulo = {};
+            bomData.forEach(item => {
+                if (item.excluido) return;
+                if (selectedSubmodules.includes(item.submodulo)) {
+                    costesModulo[item.modulo] = (costesModulo[item.modulo] || 0) + item.totalPrice;
+                }
+            });
+
+            const labelsMod = Object.keys(costesModulo);
+            const datosMod = Object.values(costesModulo);
+
+            // 2. Datos para Submódulos (Filtrado dinámicamente según los módulos seleccionados)
+            const costesSubmodulo = {};
+            bomData.forEach(item => {
+                if (item.excluido) return;
+                if (selectedModules.includes(item.modulo)) {
+                    costesSubmodulo[item.submodulo] = (costesSubmodulo[item.submodulo] || 0) + item.totalPrice;
+                }
+            });
+
+            const submodulosOrdenados = Object.entries(costesSubmodulo).sort((a, b) => b[1] - a[1]);
+
+            const labelsSub = submodulosOrdenados.map(entry => entry[0]);
+            const datosSub = submodulosOrdenados.map(entry => entry[1]);
+
+            // 3. Datos para Pareto (Filtrado de forma síncrona por módulo y submódulo seleccionados)
+            const componentesFiltrados = bomData.filter(item => {
+                if (item.excluido) return false;
+                const cumpleMod = selectedModules.includes(item.modulo);
+                const cumpleSub = selectedSubmodules.includes(item.submodulo);
+                return cumpleMod && cumpleSub;
+            });
+
+            // Agrupación dinámica por Part Number o por Descripción + Fabricante
+            const gruposPareto = {};
+            componentesFiltrados.forEach(item => {
+                let clave = "";
+                if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
+                    clave = "PN:" + item.partNumber.trim();
+                } else {
+                    clave = "DESC:" + (item.manufacturer || '') + "_" + item.description.trim();
+                }
+
+                if (!gruposPareto[clave]) {
+                    gruposPareto[clave] = {
+                        designators: [],
+                        description: item.description,
+                        manufacturer: item.manufacturer,
+                        partNumber: item.partNumber,
+                        quantity: 0,
+                        totalPrice: 0
+                    };
+                }
+
+                const desigs = item.designator.split(',').map(d => d.trim()).filter(d => d !== '');
+                gruposPareto[clave].designators.push(...desigs);
+                gruposPareto[clave].quantity += item.quantity;
+                gruposPareto[clave].totalPrice += item.totalPrice;
+            });
+
+            const componentesConsolidados = Object.values(gruposPareto).map(g => {
+                const designadorUnificado = [...new Set(g.designators)].join(', ');
+                return {
+                    designator: designadorUnificado,
+                    description: g.description,
+                    manufacturer: g.manufacturer,
+                    partNumber: g.partNumber,
+                    quantity: g.quantity,
+                    totalPrice: g.totalPrice
+                };
+            });
+
+            const componentesOrdenados = [...componentesConsolidados].sort((a, b) => b.totalPrice - a.totalPrice);
+            const totalSum = componentesOrdenados.reduce((acc, curr) => acc + curr.totalPrice, 0);
+
+            // Almacenar el Pareto visible (máximo 10 referencias de mayor impacto) en el estado global para su trazabilidad en clicks
+            currentParetoVisibleItems = componentesOrdenados.slice(0, 10);
+
+            let acumulado = 0;
+            const labelsPareto = [];
+            const datosCosteIndiv = [];
+            const datosAcumuladoPorc = [];
+
+            currentParetoVisibleItems.forEach(comp => {
+                const desigs = comp.designator.split(',').map(d => d.trim());
+                let desigLabel = desigs[0];
+                if (desigs.length > 1) {
+                    desigLabel += ` (+${desigs.length - 1})`;
+                }
+                const pnTrunc = (comp.partNumber && comp.partNumber !== 'N/A' && comp.partNumber.trim() !== '') 
+                    ? comp.partNumber.slice(0, 8) 
+                    : 'Sin PN';
+                const etiqueta = `${desigLabel} (${pnTrunc})`;
+                labelsPareto.push(etiqueta);
+                datosCosteIndiv.push(comp.totalPrice);
+                
+                acumulado += comp.totalPrice;
+                const pct = totalSum > 0 ? (acumulado / totalSum) * 100 : 0;
+                datosAcumuladoPorc.push(pct);
+            });
+
+            if (chartInstances.module) chartInstances.module.destroy();
+            if (chartInstances.submodule) chartInstances.submodule.destroy();
+            if (chartInstances.pareto) chartInstances.pareto.destroy();
+
+            const opcionesBasicasChart = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#f1f5f9', font: { size: 10, weight: '500' } }
+                    }
+                }
+            };
+
+            const ctxMod = document.getElementById('moduleChart').getContext('2d');
+            chartInstances.module = new Chart(ctxMod, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsMod,
+                    datasets: [{
+                        data: datosMod,
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'],
+                        borderWidth: 1,
+                        borderColor: '#0f172a'
+                    }]
+                },
+                options: {
+                    ...opcionesBasicasChart,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#f1f5f9', font: { size: 10, weight: '500' } } }
+                    }
+                }
+            });
+
+            const ctxSub = document.getElementById('submoduleChart').getContext('2d');
+            chartInstances.submodule = new Chart(ctxSub, {
+                type: 'bar',
+                data: {
+                    labels: labelsSub,
+                    datasets: [{
+                        label: 'Coste',
+                        data: datosSub,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...opcionesBasicasChart,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1', font: { size: 10, weight: '500' } } },
+                        y: { grid: { display: false }, ticks: { color: '#f1f5f9', font: { size: 10, weight: '500' } } }
+                    }
+                }
+            });
+
+            const ctxPareto = document.getElementById('paretoChart').getContext('2d');
+            chartInstances.pareto = new Chart(ctxPareto, {
+                type: 'bar',
+                data: {
+                    labels: labelsPareto,
+                    datasets: [
+                        {
+                            type: 'bar',
+                             label: 'Coste Consolidado',
+                            data: datosCosteIndiv,
+                            backgroundColor: '#10b981',
+                            yAxisID: 'y',
+                            borderRadius: 4
+                        },
+                        {
+                            type: 'line',
+                            label: '% Acumulado',
+                            data: datosAcumuladoPorc,
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            fill: false,
+                            pointBackgroundColor: '#f59e0b',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    ...opcionesBasicasChart,
+                    // Optimización de interactividad para simplificar el área de pulsación (colisión adaptativa)
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    // Captura e interactividad al hacer clic sobre las barras de Pareto de forma segura
+                    onClick: (event, elements, chartInstance) => {
+                        const activeChart = chartInstance || chartInstances.pareto;
+                        if (!activeChart) return;
+                        
+                        let activeEls = elements;
+                        // Si el argumento de elementos es nulo, se realiza la interrogación manual de la API del lienzo
+                        if (!activeEls || activeEls.length === 0) {
+                            activeEls = activeChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
+                        }
+                        
+                        if (activeEls && activeEls.length > 0) {
+                            const index = activeEls[0].index;
+                            if (index !== undefined && index >= 0 && index < currentParetoVisibleItems.length) {
+                                const itemClicado = currentParetoVisibleItems[index];
+                                if (itemClicado) {
+                                    filtrarTablaPorPareto(itemClicado);
+                                }
+                            }
+                        }
+                    },
+                    // Control seguro del cursor interactivo omitiendo la referencia event.native
+                    onHover: (event, elements, chartInstance) => {
+                        const activeChart = chartInstance || chartInstances.pareto;
+                        if (activeChart && activeChart.canvas) {
+                            let activeEls = elements;
+                            if (!activeEls || activeEls.length === 0) {
+                                activeEls = activeChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
+                            }
+                            activeChart.canvas.style.cursor = (activeEls && activeEls.length > 0) ? 'pointer' : 'default';
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#f1f5f9', font: { size: 9, weight: '500' } }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            min: 0,
+                            max: 100,
+                            ticks: { color: '#fbbf24', font: { size: 10, weight: '600' } }
+                        },
+                        x: {
+                            ticks: { color: '#cbd5e1', font: { size: 9, weight: '500' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // CONTROLADOR DE ACCIÓN DE FILTRADO INTERACTIVO DESDE EL GRÁFICO DE PARETO
+        function filtrarTablaPorPareto(paretoItem) {
+            if (activeParetoFilter && 
+                ((paretoItem.partNumber && paretoItem.partNumber !== 'N/A' && activeParetoFilter.partNumber === paretoItem.partNumber) ||
+                 (activeParetoFilter.description === paretoItem.description && activeParetoFilter.manufacturer === paretoItem.manufacturer))) {
+                activeParetoFilter = null;
+                mostrarToast("Filtro de Pareto desactivado.");
+            } else {
+                activeParetoFilter = paretoItem;
+                const refName = paretoItem.partNumber && paretoItem.partNumber !== 'N/A' ? paretoItem.partNumber : 'Componente sin PN';
+                mostrarToast(`Filtrando tabla por referencia de Pareto: ${refName}`);
+            }
+            filtrarYRenderizarTabla();
+            actualizarBadgePareto();
+        }
+
+        // LIMPIEZA MANUAL DEL FILTRO DE PARETO DESDE EL BADGE DE LA TABLA
+        function clearParetoFilter() {
+            activeParetoFilter = null;
+            filtrarYRenderizarTabla();
+            actualizarBadgePareto();
+            mostrarToast("Filtro de Pareto desactivado.");
+        }
+
+        // CONTROL VISUAL DE LOS BADGES DE FILTRADO ACTIVO EN LA SECCIÓN DE RESULTADOS DE LA TABLA
+        function actualizarBadgePareto() {
+            const badge = document.getElementById('paretoActiveBadge');
+            const badgeText = document.getElementById('paretoActiveBadgeText');
+            if (badge && badgeText) {
+                if (activeParetoFilter) {
+                    badge.classList.remove('hidden');
+                    const pn = (activeParetoFilter.partNumber && activeParetoFilter.partNumber !== 'N/A' && activeParetoFilter.partNumber.trim() !== '') 
+                        ? activeParetoFilter.partNumber 
+                        : 'Sin PN';
+                    badgeText.textContent = `Filtro Pareto: ${pn}`;
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+
+        // ALGORITMO DE FILTRADO Y ACTUALIZACIÓN DE LA TABLA DINÁMICA
+        function filtrarYRenderizarTabla() {
+            const query = document.getElementById('tableSearch').value.toLowerCase();
+
+            const tableBody = document.getElementById('bomTableBody');
+            tableBody.innerHTML = '';
+
+            let visibles = 0;
+
+            bomData.forEach((item, index) => {
+                const cumpleQuery = item.designator.toLowerCase().includes(query) || 
+                                    item.description.toLowerCase().includes(query) || 
+                                    item.partNumber.toLowerCase().includes(query) ||
+                                    item.manufacturer.toLowerCase().includes(query);
+
+                const cumpleMod = selectedModules.includes(item.modulo);
+                const cumpleSub = selectedSubmodules.includes(item.submodulo);
+
+                // Filtro dinámico DTC en base al botón de alternancia activo
+                let cumpleDTC = true;
+                if (activeDTCFilter) {
+                    const info = obtenerToleranciaYTipo(item);
+                    const desc = item.description.toLowerCase();
+                    
+                    if (activeDTCFilter === 'TOLERANCIAS_COSTOSAS') {
+                        if (info.esResistor && info.tolVal !== null && info.tolVal < 5) {
+                            cumpleDTC = true;
+                        } else if (info.esCapacitor && !info.esElectrolitico && info.tolVal !== null && info.tolVal < 10) {
+                            cumpleDTC = true;
+                        } else if (info.esCapacitor && info.esElectrolitico && info.tolVal !== null && info.tolVal < 20) {
+                            cumpleDTC = true;
+                        } else {
+                            cumpleDTC = false;
+                        }
+                    } 
+                    else if (activeDTCFilter === 'ENCAPSULADOS_RESISTORES') {
+                        const tieneEnc = desc.includes('0603') || desc.includes('0805') || desc.includes('1206') || desc.includes('1210') || desc.includes('sot') || desc.includes('to-247') || desc.includes('axial');
+                        cumpleDTC = info.esResistor && tieneEnc;
+                    } 
+                    else if (activeDTCFilter === 'ENCAPSULADOS_CAPACITORES') {
+                        const tieneEnc = desc.includes('0603') || desc.includes('0805') || desc.includes('1206') || desc.includes('1210') || desc.includes('sot') || desc.includes('to-247') || desc.includes('electrolit') || desc.includes('tantal');
+                        cumpleDTC = info.esCapacitor && tieneEnc;
+                    } 
+                    else if (activeDTCFilter === 'DIELECTRICOS_COSTOSOS') {
+                        const tieneC0GNP0 = desc.includes('c0g') || desc.includes('np0');
+                        cumpleDTC = info.esCapacitor && tieneC0GNP0;
+                    }
+                }
+
+                // Filtro dinámico cruzado por interacción del gráfico de Pareto
+                let cumplePareto = true;
+                if (activeParetoFilter) {
+                    if (activeParetoFilter.partNumber && activeParetoFilter.partNumber !== 'N/A' && activeParetoFilter.partNumber.trim() !== '') {
+                        cumplePareto = (item.partNumber && item.partNumber.trim() === activeParetoFilter.partNumber.trim());
+                    } else {
+                        cumplePareto = (item.description.trim() === activeParetoFilter.description.trim() && 
+                                        item.manufacturer.trim() === activeParetoFilter.manufacturer.trim());
+                    }
+                }
+
+                if (cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto) {
+                    visibles++;
+                    const row = document.createElement('tr');
+                    row.className = `hover:bg-slate-800/40 transition-all duration-200 group ${item.excluido ? 'opacity-40' : ''}`;
+
+                    let partNumberHTML = `<span class="text-slate-500 select-none">N/A</span>`;
+                    if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
+                        const searchUrl = `https://www.unikeyic.com/search?keyword=${encodeURIComponent(item.partNumber)}`;
+                        partNumberHTML = `
+                            <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
+                               class="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1 transition-colors"
+                               title="Buscar '${item.partNumber}' en Unikey IC (abre nueva pestaña)">
+                                <span>${item.partNumber}</span>
+                                <svg class="w-3 h-3 text-blue-400/60 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
+                                </svg>
+                            </a>
+                        `;
+                    }
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-center">
+                            <input type="checkbox" class="rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500 focus:ring-offset-slate-950 w-4 h-4 cursor-pointer" 
+                                ${item.excluido ? 'checked' : ''} 
+                                onchange="toggleExcluirComponente(${item.originalIndex}, this.checked)">
+                        </td>
+                        <td class="px-6 py-4 font-mono font-medium text-slate-300">${item.designator}</td>
+                        <td class="px-6 py-4 text-xs text-slate-400 max-w-xs truncate" title="${item.description}">${item.description}</td>
+                        <td class="px-6 py-4 text-center font-semibold text-slate-300">${item.quantity}</td>
+                        <td class="px-6 py-4 text-xs text-slate-400">${item.manufacturer}</td>
+                        <td class="px-6 py-4 font-mono text-xs">${partNumberHTML}</td>
+                        <td class="px-6 py-4 font-mono text-slate-300">${item.unitPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</td>
+                        <td class="px-6 py-4 text-right font-mono font-bold text-slate-200">${item.totalPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] uppercase font-bold">${item.modulo}</span></td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] uppercase font-bold">${item.submodulo}</span></td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+
+            document.getElementById('visibleCount').textContent = visibles;
+            document.getElementById('totalCount').textContent = bomData.length;
+
+            // Actualizar estado del checkbox del header "Excluir Todos"
+            const headerCheckbox = document.getElementById('excluirTodosHeaderCheckbox');
+            if (headerCheckbox) {
+                if (bomData.length > 0) {
+                    const todosExcluidos = bomData.every(item => item.excluido);
+                    headerCheckbox.checked = todosExcluidos;
+                    const algunoExcluido = bomData.some(item => item.excluido);
+                    headerCheckbox.indeterminate = algunoExcluido && !todosExcluidos;
+                } else {
+                    headerCheckbox.checked = false;
+                    headerCheckbox.indeterminate = false;
+                }
+            }
+        }
+
+        // RENDERIZADO ADAPTATIVO DE LOS 4 CAMPOS DTC REQUERIDOS (CON CORRECCIÓN DE ENTIDADES HTML)
+        function ejecutarAlertasDTC() {
+            const container = document.getElementById('alertsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            // Filtrar los datos en base a la selección activa de módulo y submódulo en el panel
+            const datosFiltrados = bomData.filter(item => {
+                if (item.excluido) return false;
+                const cumpleMod = selectedModules.includes(item.modulo);
+                const cumpleSub = selectedSubmodules.includes(item.submodulo);
+                return cumpleMod && cumpleSub;
+            });
+
+            // 1. Tolerancias generalmente más costosas (R < 5%, C no electrolítico < 10%, C electrolítico < 20%)
+            const tolCostosasItems = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                if (info.esResistor && info.tolVal !== null && info.tolVal < 5) return true;
+                if (info.esCapacitor && !info.esElectrolitico && info.tolVal !== null && info.tolVal < 10) return true;
+                if (info.esCapacitor && info.esElectrolitico && info.tolVal !== null && info.tolVal < 20) return true;
+                return false;
+            });
+
+            // 2. Unificación de encapsulados de resistencias (Rxx)
+            const encapResistoresItems = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                const desc = item.description.toLowerCase();
+                const tieneEnc = desc.includes('0603') || desc.includes('0805') || desc.includes('1206') || desc.includes('1210') || desc.includes('sot') || desc.includes('to-247') || desc.includes('axial');
+                return info.esResistor && tieneEnc;
+            });
+
+            // 3. Unificación de encapsulados de condensadores (Cxx)
+            const encapCapacitoresItems = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                const desc = item.description.toLowerCase();
+                const tieneEnc = desc.includes('0603') || desc.includes('0805') || desc.includes('1206') || desc.includes('1210') || desc.includes('sot') || desc.includes('to-247') || desc.includes('electrolit') || desc.includes('tantal');
+                return info.esCapacitor && tieneEnc;
+            });
+
+            // 4. Dieléctricos más costosos (específicamente detecta C0G/NP0)
+            const dielectricosItems = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                const desc = item.description.toLowerCase();
+                const tieneC0GNP0 = desc.includes('c0g') || desc.includes('np0');
+                return info.esCapacitor && tieneC0GNP0;
+            });
+
+            // Estructura de metadatos con escape de caracteres '<' a '&lt;' para evitar romper el análisis del DOM
+            const camposDTC = [
+                {
+                    id: 'TOLERANCIAS_COSTOSAS',
+                    titulo: 'Tolerancias Más Costosas',
+                    desc: 'Pasivos con tolerancias estrechas: Resistencias &lt; 5%, condensadores no electrolíticos &lt; 10% y electrolíticos &lt; 20%.',
+                    count: tolCostosasItems.length,
+                    claseColor: 'border-rose-900/40 bg-rose-950/20 text-rose-300',
+                    queEs: 'Componentes pasivos de precisión de alta exigencia que incrementan significativamente el coste directo de materiales.',
+                    comoMejorar: 'Auditar el circuito para verificar si los requerimientos de tolerancia pueden ser flexibilizados a valores comerciales estándar (ej. unificar a 1% en resistencias generales o 20% en condensadores).'
+                },
+                {
+                    id: 'ENCAPSULADOS_RESISTORES',
+                    titulo: 'Encapsulados Resistencias',
+                    desc: 'Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de resistencias (Rxx).',
+                    count: encapResistoresItems.length,
+                    claseColor: 'border-violet-900/40 bg-violet-950/20 text-violet-300',
+                    queEs: 'Diversidad de empaques geométricos (ej: 0402, 0603, 0805, 1206) presentes únicamente dentro de la familia de resistencias.',
+                    comoMejorar: 'Unificar los formatos superficiales (por ejemplo, estandarizar a empaque 0603 en lugar de mezclar 0402, 0603 y 0805) para reducir costes de configuración de máquina de colocación (*pick-and-place*).'
+                },
+                {
+                    id: 'ENCAPSULADOS_CAPACITORES',
+                    titulo: 'Encapsulados Condensadores',
+                    desc: 'Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de condensadores (Cxx).',
+                    count: encapCapacitoresItems.length,
+                    claseColor: 'border-blue-900/40 bg-blue-950/20 text-blue-300',
+                    queEs: 'Métrica de distribución geométrica y empaques físicos del conjunto de capacitores de desacoplo y filtrado cerámicos o electrolíticos.',
+                    comoMejorar: 'Consolidar empaques físicos hacia tamaños estándar unificados que satisfagan el voltaje nominal máximo y la rigidez dieléctrica requerida.'
+                },
+                {
+                    id: 'DIELECTRICOS_COSTOSOS',
+                    titulo: 'Dieléctricos C0G/NP0',
+                    desc: 'Filtra condensadores que implementan dieléctricos cerámicos de Clase 1 (ultra-estabilidad térmica y baja disipación).',
+                    count: dielectricosItems.length,
+                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    queEs: 'Condensadores que usan dieléctricos C0G o NP0 por su deriva térmica casi nula y coeficiente de disipación de alta estabilidad.',
+                    comoMejorar: 'Sustituir por dieléctricos de Clase 2 (X7R o X5R) en líneas de acoplo, filtrado o desacoplo de alimentación general donde la deriva de capacidad con la temperatura no sea crítica.'
+                }
+            ];
+
+            // Renderizar permanentemente las tarjetas en el grid adaptativo de 4 columnas
+            camposDTC.forEach(campo => {
+                const card = document.createElement('div');
+                const esActivo = activeDTCFilter === campo.id;
+                
+                const btnClase = esActivo 
+                    ? 'bg-amber-600 text-white border-amber-500 hover:bg-amber-500' 
+                    : 'bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700';
+                const btnTexto = esActivo ? '✓ Activo' : 'Ver';
+
+                card.className = `p-4 border rounded-xl flex flex-col justify-between gap-3 ${campo.claseColor}`;
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-semibold text-white">
+                                <h4 class="text-xs font-bold uppercase tracking-wider">${campo.titulo}</h4>
+                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
+                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                        ${campo.queEs}
+                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
+                                        ${campo.comoMejorar}
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">${campo.count} ref.</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">${campo.desc}</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
+                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
+                        <button onclick="toggleDTCFilter('${campo.id}')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all ${btnClase}">
+                            ${btnTexto}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Actualizar la visibilidad del badge general del filtro DTC activo
+            const dtcActiveBadge = document.getElementById('dtcActiveBadge');
+            const dtcActiveBadgeText = document.getElementById('dtcActiveBadgeText');
+            if (dtcActiveBadge && dtcActiveBadgeText) {
+                if (activeDTCFilter) {
+                    dtcActiveBadge.classList.remove('hidden');
+                    let txt = "Filtro DTC";
+                    if (activeDTCFilter === 'TOLERANCIAS_COSTOSAS') txt = "Filtro: Tolerancias más costosas";
+                    if (activeDTCFilter === 'ENCAPSULADOS_RESISTORES') txt = "Filtro: Unificación encapsulados resistencias (Rxx)";
+                    if (activeDTCFilter === 'ENCAPSULADOS_CAPACITORES') txt = "Filtro: Unificación encapsulados condensadores (Cxx)";
+                    if (activeDTCFilter === 'DIELECTRICOS_COSTOSOS') txt = "Filtro: Dieléctricos más costosos (C0G/NP0)";
+                    dtcActiveBadgeText.textContent = txt;
+                } else {
+                    dtcActiveBadge.classList.add('hidden');
+                }
+            }
+            
+            // Garantizar que la tipografía de las ecuaciones recién inyectadas sea renderizada por KaTeX
+            triggerMathRender();
+        }
+    </script>
+
+    <!-- MODAL DE AYUDA (ESTRUCTURA CSV) -->
+    <div id="helpModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="helpModalCard" class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl scale-95 transition-all duration-300 relative space-y-4">
+            <!-- Cabecera del modal -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-white font-bold text-base">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Estructura del CSV Requerida
+                </div>
+                <button type="button" onclick="closeHelpModal()" class="text-slate-400 hover:text-white font-extrabold text-2xl leading-none">×</button>
+            </div>
+            
+            <!-- Cuerpo del modal -->
+            <div class="text-xs text-slate-300 space-y-3 leading-relaxed">
+                <p>
+                    Para importar un nuevo archivo, asegúrese de que contenga las siguientes columnas en este orden exacto (se admiten sinónimos comunes de forma automática al pasar el cursor):
+                </p>
+                <div class="grid grid-cols-2 gap-x-6 gap-y-2.5 text-[11px] font-mono bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: designator, refdes, referencia, componente">
+                        <span class="text-blue-500 font-bold">01.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Designator</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: unit price, unitprice, precio unitario, precio_unit, coste unitario">
+                        <span class="text-blue-500 font-bold">06.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Unit Price</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: description, descripción, descrip, value, valor">
+                        <span class="text-blue-500 font-bold">02.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Description</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: total price, totalprice, precio total, precio_total, coste total">
+                        <span class="text-blue-500 font-bold">07.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Total Price</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: quantity, qty, cantidad, cant">
+                        <span class="text-blue-500 font-bold">03.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Quantity</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: modulo, módulo, module">
+                        <span class="text-blue-500 font-bold">08.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Modulo</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: manufacturer, fabricante, mfg">
+                        <span class="text-blue-500 font-bold">04.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">Manufacturer</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: submodulo, submódulo, submodule">
+                        <span class="text-blue-500 font-bold">09.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">SubModulo</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 cursor-help" title="Sinónimos válidos: partnumber, pn, part number, referencia fabricante, mpn">
+                        <span class="text-blue-500 font-bold">05.</span>
+                        <span class="text-slate-200 underline decoration-dotted decoration-slate-600">PartNumber</span>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 border-t border-slate-800 pt-3 flex items-center justify-between">
+                    <span>Separadores aceptados: <strong class="text-slate-400">;</strong> o <strong class="text-slate-400">,</strong></span>
+                    <span>Codificación: <strong class="text-slate-400">UTF-8</strong></span>
+                </div>
+            </div>
+
+            <!-- Botones del modal -->
+            <div class="flex justify-end border-t border-slate-800 pt-3">
+                <button type="button" onclick="closeHelpModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</body></html>
