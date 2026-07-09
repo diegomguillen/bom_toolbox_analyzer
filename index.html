@@ -318,123 +318,32 @@
 
         <!-- ANALISIS AUTOMATIZADO Y OPORTUNIDADES DE REDUCCIÓN DE COSTES (DTC) -->
         <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 space-y-4">
-            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                <span class="text-amber-500">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div class="flex items-center justify-between border-b border-slate-850 pb-3 cursor-pointer select-none" onclick="toggleDTCCollapse()">
+                <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                    <span class="text-amber-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </span>
+                    <span>Análisis Automatizado y Oportunidades de Reducción de Costes (DTC)</span>
+                </h3>
+                <span class="text-slate-500 hover:text-slate-300 transition-colors">
+                    <svg id="dtcCollapseChevron" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    </svg>
                 </span>
-                <span>Análisis Automatizado y Oportunidades de Reducción de Costes (DTC)</span>
-            </h3>
+            </div>
 
-            <!-- Grid de 4 columnas para hospedar las 4 métricas de optimización -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="alertsContainer"><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-rose-900/40 bg-rose-950/20 text-rose-300">
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 font-semibold text-white">
-                                <h4 class="text-xs font-bold uppercase tracking-wider">Tolerancias Más Costosas</h4>
-                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
-                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
-                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
-                                        Componentes pasivos de precisión de alta exigencia que incrementan significativamente el coste directo de materiales.
-                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
-                                        Auditar el circuito para verificar si los requerimientos de tolerancia pueden ser flexibilizados a valores comerciales estándar (ej. unificar a 1% en resistencias generales o 20% en condensadores).
-                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
-                                    </span>
-                                </span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">5 ref.</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Pasivos con tolerancias estrechas: Resistencias &lt; 5%, condensadores no electrolíticos &lt; 10% y electrolíticos &lt; 20%.</p>
+            <!-- Contenedor del contenido DTC (colapsable) -->
+            <div id="dtcContentContainer" class="space-y-4">
+                <!-- Selectores de Pestañas (Tabs) -->
+                <div class="flex flex-wrap gap-2 text-xs" id="dtcTabsContainer"></div>
+                
+                <!-- Grid unificado para hospedar las métricas DTC de la pestaña activa -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="alertsContainer">
+                    <div class="text-xs text-slate-500 text-center py-4 select-none animate-pulse col-span-full">
+                        Cargue un BOM para mostrar las métricas DTC...
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
-                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
-                        <button onclick="toggleDTCFilter('TOLERANCIAS_COSTOSAS')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
-                            Ver
-                        </button>
-                    </div>
-                </div><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-violet-900/40 bg-violet-950/20 text-violet-300">
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 font-semibold text-white">
-                                <h4 class="text-xs font-bold uppercase tracking-wider">Encapsulados Resistencias</h4>
-                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
-                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
-                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
-                                        Diversidad de empaques geométricos (ej: 0402, 0603, 0805, 1206) presentes únicamente dentro de la familia de resistencias.
-                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
-                                        Unificar los formatos superficiales (por ejemplo, estandarizar a empaque 0603 en lugar de mezclar 0402, 0603 y 0805) para reducir costes de configuración de máquina de colocación (*pick-and-place*).
-                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
-                                    </span>
-                                </span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">5 ref.</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de resistencias (Rxx).</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
-                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
-                        <button onclick="toggleDTCFilter('ENCAPSULADOS_RESISTORES')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
-                            Ver
-                        </button>
-                    </div>
-                </div><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-blue-900/40 bg-blue-950/20 text-blue-300">
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 font-semibold text-white">
-                                <h4 class="text-xs font-bold uppercase tracking-wider">Encapsulados Condensadores</h4>
-                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
-                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
-                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
-                                        Métrica de distribución geométrica y empaques físicos del conjunto de capacitores de desacoplo y filtrado cerámicos o electrolíticos.
-                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
-                                        Consolidar empaques físicos hacia tamaños estándar unificados que satisfagan el voltaje nominal máximo y la rigidez dieléctrica requerida.
-                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
-                                    </span>
-                                </span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">4 ref.</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de condensadores (Cxx).</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
-                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
-                        <button onclick="toggleDTCFilter('ENCAPSULADOS_CAPACITORES')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
-                            Ver
-                        </button>
-                    </div>
-                </div><div class="p-4 border rounded-xl flex flex-col justify-between gap-3 border-emerald-900/40 bg-emerald-950/20 text-emerald-300">
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 font-semibold text-white">
-                                <h4 class="text-xs font-bold uppercase tracking-wider">Dieléctricos C0G/NP0</h4>
-                                <!-- Icono Ayuda Contextual con Tooltip Dinámico -->
-                                <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
-                                        <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
-                                        Condensadores que usan dieléctricos C0G o NP0 por su deriva térmica casi nula y coeficiente de disipación de alta estabilidad.
-                                        <span class="block font-bold text-emerald-400 mt-2 mb-1">¿Cómo mejorar?</span>
-                                        Sustituir por dieléctricos de Clase 2 (X7R o X5R) en líneas de acoplo, filtrado o desacoplo de alimentación general donde la deriva de capacidad con la temperatura no sea crítica.
-                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
-                                    </span>
-                                </span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-950/70 font-bold border border-slate-800/60 shrink-0">0 ref.</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Filtra condensadores que implementan dieléctricos cerámicos de Clase 1 (ultra-estabilidad térmica y baja disipación).</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
-                        <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Métrica DTC</span>
-                        <button onclick="toggleDTCFilter('DIELECTRICOS_COSTOSOS')" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">
-                            Ver
-                        </button>
-                    </div>
-                </div></div>
+                </div>
+            </div>
         </div>
 
         <!-- TABLA DE COMPONENTES E INTERFAZ WHAT-IF -->
@@ -444,7 +353,7 @@
             <div class="p-5 border-b border-slate-800 bg-slate-900/20 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                     <h3 class="text-sm font-semibold text-white">Inspección de Materiales y Simulación What-If</h3>
-                    <p class="text-xs text-slate-400">Edite los costes unitarios directamente en la tabla para recalcular de inmediato el impacto en el sistema</p>
+                    <p class="text-xs text-slate-400">Excluya componentes de la tabla para analizar el impacto directo en los KPIs de coste y cantidad</p>
                 </div>
                 
                 <!-- Buscador e interruptores de filtrado -->
@@ -559,22 +468,31 @@ C2;Condensador 1uF, 50V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KB8NQNC;US$0,0200;US$0
 C4;Condensador 1uF, 50V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KB8NQNC;US$0,0200;US$0,0200;MainBoard;3V3P;Not_model_defined;
 C27;Condensador 1uF, 50V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KB8NQNC;US$0,0200;US$0,0200;MainBoard;3V3P;Not_model_defined;
 C28;Condensador 10uF, 16V, 10%, X5R, 0805;1;MURATA;GRM21BR61C106KE15L;US$0,0500;US$0,0500;MainBoard;3V3P;Not_model_defined;
+C29;Condensador 1uF, 16V, 10%, X7R, 0603;1;SAMSUNG;CL10B105KO8NNNC;US$0,0100;US$0,0100;MainBoard;3V3P;Not_model_defined;
+C31;Condensador 1.3uF, 25V, 10%, X7R, 0603;1;SAMSUNG;CL10B135KA8NNNC;US$0,1200;US$0,1200;MainBoard;3V3P;Not_model_defined;
 R32;Resistencia 10K, 1%, 100mW, 0603;1;VISHAY;CRCW060310K0FKEB;US$0,1000;US$0,1000;PowerSupply;IPM_CURR;Not_model_defined;
 R50;Resistencia 20K, 1%, 100mW, 0603;1;VISHAY;CRCW060320K0FKEA;US$0,1000;US$0,1000;PowerSupply;IPM_TEMP;Not_model_defined;
+R51;Resistencia 20K, 1%, 100mW, 0603;1;VISHAY;CRCW060320K0FKEA;US$0,1500;US$0,1500;PowerSupply;IPM_TEMP;Not_model_defined;
 R16, R17, R18, R19, R20, R21, R22;Resistencia 22R, 1%, 330mW, 0603;7;VISHAY;CRCW060322R0FKEAHP;US$0,1000;US$0,7000;PowerSupply;COMUN;Not_model_defined;
 R30;Resistencia 100R, 1%, 100mW, 0603;1;VISHAY;CRCW0603100RFKEA;US$0,1000;US$0,1000;PowerSupply;IPM_CURR;Not_model_defined;
 R35, R36;Resistencia 4K7, 1%, 100mW, 0603;2;YAGEO;RC0603FR-074K7L;US$0,0150;US$0,0300;MainBoard;COMUN;Not_model_defined;
+R45;Resistencia 12.1K, 1%, 100mW, 0603;1;YAGEO;RC0603FR-0712K1L;US$0,0150;US$0,0150;MainBoard;COMUN;Not_model_defined;
 U1;Microcontrolador de señal mixta 32-bit Cortex-M4;1;ST;STM32G474RET6;US$4,5000;US$4,5000;MainBoard;MCU;Not_model_defined;
 U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,8500;MainBoard;COMUN;Not_model_defined;`;
 
         // ESTADO GLOBAL DE LA APLICACIÓN
         let bomData = [];
         let chartInstances = {};
-        let activeDTCFilter = null; // Filtro activo ('TOLERANCIAS_COSTOSAS', 'ENCAPSULADOS_RESISTORES', 'ENCAPSULADOS_CAPACITORES', 'DIELECTRICOS_COSTOSOS')
+        let activeDTCFilter = null; // Filtro activo
+        let activeDTCTab = 'todos'; // Pestaña activa del panel DTC ('todos', 'resistores', 'capacitores', 'generales')
+        let isDTCCollapsed = false; // Estado de colapsado del panel DTC
         let activeParetoFilter = null; // Almacena la referencia consolidada clicada en Pareto
         let currentParetoVisibleItems = []; // Listado de referencias consolidadas visibles en el Pareto actual (máx 10)
         let selectedModules = [];
         let selectedSubmodules = [];
+        let partNumbersConConflictoPrecio = new Set(); // Guarda los Part Numbers con inconsistencias de precio
+        let preciosMinimosPorPN = {}; // Guarda el precio unitario mínimo para cada Part Number con conflicto
+        let gruposConTensionRedundanteGlobal = new Set(); // Guarda los grupos (capacidad_encapsulado) de condensadores con tensiones mezcladas
 
         // INICIALIZACIÓN
         window.addEventListener('DOMContentLoaded', () => {
@@ -837,7 +755,132 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
 
             const esElectrolitico = esCapacitor && (desc.includes('electrolit') || desc.includes('aluminio') || desc.includes('elco') || desc.includes('tantal'));
 
-            return { esResistor, esCapacitor, esElectrolitico, tolVal };
+            // EXTRAER VOLTAJE (ej. 50V, 16V)
+            const vMatch = desc.match(/\b(\d+)\s*v\b/);
+            const tensionVal = vMatch ? parseInt(vMatch[1]) : null;
+
+            // EXTRAER CAPACIDAD (ej. 1uF, 10uF, 100nF)
+            const capMatch = desc.match(/\b(\d+(?:[\.,]\d+)?\s*(?:uf|nf|pf|f))\b/i);
+            const capacidadVal = capMatch ? capMatch[1].replace(/\s+/g, '').toLowerCase() : null;
+
+            // EXTRAER ENCAPSULADO SMT
+            let encapsuladoVal = null;
+            const encapMatch = desc.match(/\b(0603|0805|1206|1210|sot|to-247)\b/);
+            if (encapMatch) {
+                encapsuladoVal = encapMatch[1];
+            }
+
+            return { esResistor, esCapacitor, esElectrolitico, tolVal, tensionVal, capacidadVal, encapsuladoVal };
+        }
+
+        // AUXILIAR: EXTRACTOR Y NORMALIZADOR DE VALOR ÓHMICO DE RESISTENCIAS
+        function obtenerValorBaseResistencia(desc) {
+            const descL = desc.toLowerCase();
+            // Buscar formato con letra en medio (ej. 4k7, 2r2, 12k1)
+            let match = descL.match(/\b(\d+)([kmr])(\d+)\b/);
+            let valor = null;
+            if (match) {
+                const entero = match[1];
+                const unidad = match[2];
+                const decimal = match[3];
+                let mult = 1;
+                if (unidad === 'k') mult = 1000;
+                if (unidad === 'm') mult = 1000000;
+                valor = parseFloat(`${entero}.${decimal}`) * mult;
+            } else {
+                // Buscar formato decimal normal con unidad al final o espacio (ej. 10k, 12.1k, 100 ohm, 22r)
+                match = descL.match(/\b(\d+(?:[\.,]\d+)?)\s*([kmro])/);
+                if (match) {
+                    const num = parseFloat(match[1].replace(',', '.'));
+                    const unidad = match[2];
+                    let mult = 1;
+                    if (unidad === 'k') mult = 1000;
+                    if (unidad === 'm') mult = 1000000;
+                    valor = num * mult;
+                }
+            }
+            if (valor === null || valor <= 0) return null;
+            
+            // Normalizar el valor a base 10-99 (ej: 10000 -> 1000 -> 100 -> 10)
+            let valNorm = valor;
+            while (valNorm >= 100) {
+                valNorm /= 10;
+            }
+            while (valNorm < 10) {
+                valNorm *= 10;
+            }
+            return Math.round(valNorm * 100) / 100;
+        }
+
+        // AUXILIAR: EXTRACTOR Y NORMALIZADOR DE VALOR DE CAPACIDAD DE CONDENSADORES
+        function obtenerValorBaseCapacidad(capStr) {
+            if (!capStr) return null;
+            // capStr tiene formato ej. "1uf", "100nf", "220pf"
+            const match = capStr.match(/^([\d.,]+)\s*(uf|nf|pf|f)$/i);
+            if (!match) return null;
+            const num = parseFloat(match[1].replace(',', '.'));
+            if (isNaN(num) || num <= 0) return null;
+            
+            // Normalizar a una base entre 10 y 99.99
+            let valNorm = num;
+            while (valNorm >= 100) {
+                valNorm /= 10;
+            }
+            while (valNorm < 10) {
+                valNorm *= 10;
+            }
+            return Math.round(valNorm * 100) / 100;
+        }
+
+        // AUXILIAR: CALCULAR CONFLICTOS DE PRECIOS POR PART NUMBER
+        function calcularConflictosDePrecio() {
+            partNumbersConConflictoPrecio.clear();
+            preciosMinimosPorPN = {};
+            const preciosPorPN = {};
+            
+            bomData.forEach(item => {
+                if (item.excluido) return;
+                const pn = item.partNumber ? item.partNumber.trim().toUpperCase() : '';
+                if (!pn || pn === 'N/A') return;
+                
+                if (!preciosPorPN[pn]) {
+                    preciosPorPN[pn] = [];
+                }
+                // Usamos una pequeña tolerancia para evitar diferencias por float rounding
+                const yaExiste = preciosPorPN[pn].some(p => Math.abs(p - item.unitPrice) < 0.0001);
+                if (!yaExiste) {
+                    preciosPorPN[pn].push(item.unitPrice);
+                }
+            });
+            
+            for (const [pn, precios] of Object.entries(preciosPorPN)) {
+                if (precios.length > 1) {
+                    partNumbersConConflictoPrecio.add(pn);
+                    preciosMinimosPorPN[pn] = Math.min(...precios);
+                }
+            }
+        }
+
+        // AUXILIAR: CALCULAR GRUPOS DE CAPACITORES CON TENSIONES REDUNDANTES
+        function calcularTensionesRedundantes() {
+            gruposConTensionRedundanteGlobal.clear();
+            const tensionesPorGrupo = {};
+            bomData.forEach(item => {
+                if (item.excluido) return;
+                const info = obtenerToleranciaYTipo(item);
+                if (info.esCapacitor && info.capacidadVal && info.encapsuladoVal && info.tensionVal !== null) {
+                    const clave = `${info.capacidadVal}_${info.encapsuladoVal}`;
+                    if (!tensionesPorGrupo[clave]) {
+                        tensionesPorGrupo[clave] = new Set();
+                    }
+                    tensionesPorGrupo[clave].add(info.tensionVal);
+                }
+            });
+            for (const [clave, tensiones] of Object.entries(tensionesPorGrupo)) {
+                if (tensiones.size > 1) {
+                    gruposConTensionRedundanteGlobal.add(clave);
+                }
+            }
         }
 
         // INTERPRETE DE CSV ROBUSTO PARA ENTORNOS CAD ELECTRONICOS
@@ -1003,6 +1046,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const cleanTitle = tituloBOM.replace(/^BOM:\s*/, '');
             document.getElementById('headerBomTitle').textContent = cleanTitle;
             bomData = procesarCSV(csvRaw);
+            calcularConflictosDePrecio();
+            calcularTensionesRedundantes();
             activeParetoFilter = null; // Restablecer filtro de Pareto
             actualizarBadgePareto();
             
@@ -1139,10 +1184,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 
                 activeParetoFilter = null;
                 actualizarBadgePareto();
-                filtrarYRenderizarTabla();
-                renderizarGraficos();
-                ejecutarAlertasDTC();
-				actualizarCalculosYVistas();
+                actualizarCalculosYVistas();
                 return;
             }
 
@@ -1171,9 +1213,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     
                     activeParetoFilter = null;
                     actualizarBadgePareto();
-                    filtrarYRenderizarTabla();
-                    renderizarGraficos();
-                    ejecutarAlertasDTC();
+                    actualizarCalculosYVistas();
                 });
                 
                 const span = document.createElement('span');
@@ -1189,9 +1229,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
 
             activeParetoFilter = null;
             actualizarBadgePareto();
-            filtrarYRenderizarTabla();
-            renderizarGraficos();
-            ejecutarAlertasDTC();
+            actualizarCalculosYVistas();
         }
 
         function updateSubmoduleLabel() {
@@ -1236,6 +1274,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
 
         // RE-CALCULAR MÉTRICAS, ACTUALIZAR GRÁFICOS Y TABLAS
         function actualizarCalculosYVistas() {
+            calcularConflictosDePrecio();
+            calcularTensionesRedundantes();
             calcularKPIs();
             renderizarGraficos();
             filtrarYRenderizarTabla();
@@ -1620,9 +1660,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const tableBody = document.getElementById('bomTableBody');
             tableBody.innerHTML = '';
 
-            let visibles = 0;
-
-            bomData.forEach((item, index) => {
+            // 1. Filtrar los elementos según todos los criterios
+            let itemsVisibles = bomData.filter(item => {
                 const cumpleQuery = item.designator.toLowerCase().includes(query) || 
                                     item.description.toLowerCase().includes(query) || 
                                     item.partNumber.toLowerCase().includes(query) ||
@@ -1660,6 +1699,42 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         const tieneC0GNP0 = desc.includes('c0g') || desc.includes('np0');
                         cumpleDTC = info.esCapacitor && tieneC0GNP0;
                     }
+                    else if (activeDTCFilter === 'ESTANDARIZACION_TENSIONES') {
+                        const clave = (info.esCapacitor && info.capacidadVal && info.encapsuladoVal) ? `${info.capacidadVal}_${info.encapsuladoVal}` : null;
+                        cumpleDTC = clave !== null && gruposConTensionRedundanteGlobal.has(clave);
+                    }
+                    else if (activeDTCFilter === 'VALORES_NO_ESTANDAR_RESISTORES') {
+                        if (info.esResistor) {
+                            const valBase = obtenerValorBaseResistencia(item.description);
+                            if (valBase !== null) {
+                                const e24Values = [10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91];
+                                const esE24 = e24Values.some(v => Math.abs(v - valBase) < 0.1);
+                                cumpleDTC = !esE24;
+                            } else {
+                                cumpleDTC = false;
+                            }
+                        } else {
+                            cumpleDTC = false;
+                        }
+                    }
+                    else if (activeDTCFilter === 'VALORES_NO_ESTANDAR_CAPACITORES') {
+                        if (info.esCapacitor) {
+                            const valBase = obtenerValorBaseCapacidad(info.capacidadVal);
+                            if (valBase !== null) {
+                                const e12Values = [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82];
+                                const esE12 = e12Values.some(v => Math.abs(v - valBase) < 0.1);
+                                cumpleDTC = !esE12;
+                            } else {
+                                cumpleDTC = false;
+                            }
+                        } else {
+                            cumpleDTC = false;
+                        }
+                    }
+                    else if (activeDTCFilter === 'PRECIOS_INCONSISTENTES') {
+                        const pn = item.partNumber ? item.partNumber.trim().toUpperCase() : '';
+                        cumpleDTC = pn !== '' && pn !== 'N/A' && partNumbersConConflictoPrecio.has(pn);
+                    }
                 }
 
                 // Filtro dinámico cruzado por interacción del gráfico de Pareto
@@ -1673,47 +1748,85 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     }
                 }
 
-                if (cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto) {
-                    visibles++;
-                    const row = document.createElement('tr');
-                    row.className = `hover:bg-slate-800/40 transition-all duration-200 group ${item.excluido ? 'opacity-40' : ''}`;
-
-                    let partNumberHTML = `<span class="text-slate-500 select-none">N/A</span>`;
-                    if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
-                        const searchUrl = `https://www.unikeyic.com/search?keyword=${encodeURIComponent(item.partNumber)}`;
-                        partNumberHTML = `
-                            <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
-                               class="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1 transition-colors"
-                               title="Buscar '${item.partNumber}' en Unikey IC (abre nueva pestaña)">
-                                <span>${item.partNumber}</span>
-                                <svg class="w-3 h-3 text-blue-400/60 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
-                                </svg>
-                            </a>
-                        `;
-                    }
-
-                    row.innerHTML = `
-                        <td class="px-6 py-4 text-center">
-                            <input type="checkbox" class="rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500 focus:ring-offset-slate-950 w-4 h-4 cursor-pointer" 
-                                ${item.excluido ? 'checked' : ''} 
-                                onchange="toggleExcluirComponente(${item.originalIndex}, this.checked)">
-                        </td>
-                        <td class="px-6 py-4 font-mono font-medium text-slate-300">${item.designator}</td>
-                        <td class="px-6 py-4 text-xs text-slate-400 max-w-xs truncate" title="${item.description}">${item.description}</td>
-                        <td class="px-6 py-4 text-center font-semibold text-slate-300">${item.quantity}</td>
-                        <td class="px-6 py-4 text-xs text-slate-400">${item.manufacturer}</td>
-                        <td class="px-6 py-4 font-mono text-xs">${partNumberHTML}</td>
-                        <td class="px-6 py-4 font-mono text-slate-300">${item.unitPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</td>
-                        <td class="px-6 py-4 text-right font-mono font-bold text-slate-200">${item.totalPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] uppercase font-bold">${item.modulo}</span></td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] uppercase font-bold">${item.submodulo}</span></td>
-                    `;
-                    tableBody.appendChild(row);
-                }
+                return cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto;
             });
 
-            document.getElementById('visibleCount').textContent = visibles;
+            // 2. Ordenar por part number si el filtro de Precios Inconsistentes está activo
+            if (activeDTCFilter === 'PRECIOS_INCONSISTENTES') {
+                itemsVisibles.sort((a, b) => {
+                    const pnA = (a.partNumber || '').trim().toUpperCase();
+                    const pnB = (b.partNumber || '').trim().toUpperCase();
+                    if (pnA === pnB) {
+                        return a.unitPrice - b.unitPrice; // En caso de igual PN, ordenar por precio para ver el desvío
+                    }
+                    return pnA.localeCompare(pnB);
+                });
+            }
+
+            // 3. Renderizar filas filtradas y ordenadas
+            itemsVisibles.forEach((item) => {
+                const row = document.createElement('tr');
+                row.className = `hover:bg-slate-800/40 transition-all duration-200 group ${item.excluido ? 'opacity-40' : ''}`;
+
+                let partNumberHTML = `<span class="text-slate-500 select-none">N/A</span>`;
+                if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
+                    const searchUrl = `https://www.unikeyic.com/search?keyword=${encodeURIComponent(item.partNumber)}`;
+                    partNumberHTML = `
+                        <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
+                           class="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1 transition-colors"
+                           title="Buscar '${item.partNumber}' en Unikey IC (abre nueva pestaña)">
+                            <span>${item.partNumber}</span>
+                            <svg class="w-3 h-3 text-blue-400/60 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
+                            </svg>
+                        </a>
+                    `;
+                }
+
+                // Resaltar celdas de precio si tiene discrepancia de precio
+                const pnLimpio = item.partNumber ? item.partNumber.trim().toUpperCase() : '';
+                const tienePrecioInconsistente = pnLimpio !== '' && pnLimpio !== 'N/A' && partNumbersConConflictoPrecio.has(pnLimpio);
+                let celdaPrecioClase = "px-6 py-4 font-mono text-slate-300";
+                let unitPriceHTML = item.unitPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+
+                if (tienePrecioInconsistente) {
+                    const esPrecioMasBajo = Math.abs(item.unitPrice - preciosMinimosPorPN[pnLimpio]) < 0.0001;
+                    if (esPrecioMasBajo) {
+                        // Resaltar en fondo verde sutil la celda, con borde izquierdo verde y texto verde/emerald
+                        celdaPrecioClase = "px-6 py-4 font-mono text-emerald-400 bg-emerald-500/5 font-semibold border-l-2 border-emerald-500/40";
+                        unitPriceHTML = `
+                            <div class="flex items-center justify-between gap-2" title="Mejor precio: Este es el precio más bajo registrado para este Part Number">
+                                <span>${unitPriceHTML}</span>
+                                <span class="text-emerald-500 cursor-help shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                        `;
+                    }
+                }
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-center">
+                        <input type="checkbox" class="rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500 focus:ring-offset-slate-950 w-4 h-4 cursor-pointer" 
+                            ${item.excluido ? 'checked' : ''} 
+                            onchange="toggleExcluirComponente(${item.originalIndex}, this.checked)">
+                    </td>
+                    <td class="px-6 py-4 font-mono font-medium text-slate-300">${item.designator}</td>
+                    <td class="px-6 py-4 text-xs text-slate-400 max-w-xs truncate" title="${item.description}">${item.description}</td>
+                    <td class="px-6 py-4 text-center font-semibold text-slate-300">${item.quantity}</td>
+                    <td class="px-6 py-4 text-xs text-slate-400">${item.manufacturer}</td>
+                    <td class="px-6 py-4 font-mono text-xs">${partNumberHTML}</td>
+                    <td class="${celdaPrecioClase}">${unitPriceHTML}</td>
+                    <td class="px-6 py-4 text-right font-mono font-bold text-slate-200">${item.totalPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] uppercase font-bold">${item.modulo}</span></td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] uppercase font-bold">${item.submodulo}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('visibleCount').textContent = itemsVisibles.length;
             document.getElementById('totalCount').textContent = bomData.length;
 
             // Actualizar estado del checkbox del header "Excluir Todos"
@@ -1731,7 +1844,29 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             }
         }
 
-        // RENDERIZADO ADAPTATIVO DE LOS 4 CAMPOS DTC REQUERIDOS (CON CORRECCIÓN DE ENTIDADES HTML)
+        // Alternar el colapsado de la sección DTC completa
+        function toggleDTCCollapse() {
+            isDTCCollapsed = !isDTCCollapsed;
+            const container = document.getElementById('dtcContentContainer');
+            const chevron = document.getElementById('dtcCollapseChevron');
+            if (container && chevron) {
+                if (isDTCCollapsed) {
+                    container.classList.add('hidden');
+                    chevron.classList.add('-rotate-90');
+                } else {
+                    container.classList.remove('hidden');
+                    chevron.classList.remove('-rotate-90');
+                }
+            }
+        }
+
+        // Cambiar la pestaña activa en el panel DTC
+        function cambiarDTCTab(tabId) {
+            activeDTCTab = tabId;
+            ejecutarAlertasDTC();
+        }
+
+        // RENDERIZADO ADAPTATIVO DE LOS CAMPOS DTC REQUERIDOS (CON CORRECCIÓN DE ENTIDADES HTML)
         function ejecutarAlertasDTC() {
             const container = document.getElementById('alertsContainer');
             if (!container) return;
@@ -1778,19 +1913,98 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 return info.esCapacitor && tieneC0GNP0;
             });
 
-            // Estructura de metadatos con escape de caracteres '<' a '&lt;' para evitar romper el análisis del DOM
+            // 5. Estandarización de tensiones para condensadores (mismo valor y encapsulado, diferente voltaje)
+            const tensionesPorGrupo = {};
+            datosFiltrados.forEach(item => {
+                const info = obtenerToleranciaYTipo(item);
+                if (info.esCapacitor && info.capacidadVal && info.encapsuladoVal && info.tensionVal !== null) {
+                    const clave = `${info.capacidadVal}_${info.encapsuladoVal}`;
+                    if (!tensionesPorGrupo[clave]) {
+                        tensionesPorGrupo[clave] = new Set();
+                    }
+                    tensionesPorGrupo[clave].add(info.tensionVal);
+                }
+            });
+            const gruposConTensionRedundante = new Set();
+            for (const [clave, tensiones] of Object.entries(tensionesPorGrupo)) {
+                if (tensiones.size > 1) {
+                    gruposConTensionRedundante.add(clave);
+                }
+            }
+            const tensionesRedundantesItems = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                if (info.esCapacitor && info.capacidadVal && info.encapsuladoVal) {
+                    const clave = `${info.capacidadVal}_${info.encapsuladoVal}`;
+                    return gruposConTensionRedundante.has(clave);
+                }
+                return false;
+            });
+
+            // 6. Resistencias con valores no estándar (no pertenecen a la serie E24)
+            const valoresNoE24Items = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                if (!info.esResistor) return false;
+                const valBase = obtenerValorBaseResistencia(item.description);
+                if (valBase === null) return false;
+                const e24Values = [10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91];
+                const esE24 = e24Values.some(v => Math.abs(v - valBase) < 0.1);
+                return !esE24;
+            });
+
+            // 7. Condensadores con valores de capacidad no estándar (no pertenecen a la serie E12)
+            const valoresNoE12CapacitoresItems = datosFiltrados.filter(item => {
+                const info = obtenerToleranciaYTipo(item);
+                if (!info.esCapacitor) return false;
+                const valBase = obtenerValorBaseCapacidad(info.capacidadVal);
+                if (valBase === null) return false;
+                const e12Values = [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82];
+                const esE12 = e12Values.some(v => Math.abs(v - valBase) < 0.1);
+                return !esE12;
+            });
+
+            // 8. Part Numbers con precios unitarios inconsistentes (solo cuenta los incorrectos, es decir, los que no tienen el coste mínimo)
+            const preciosInconsistentesItems = datosFiltrados.filter(item => {
+                const pn = item.partNumber ? item.partNumber.trim().toUpperCase() : '';
+                if (!pn || pn === 'N/A') return false;
+                const tieneConflicto = partNumbersConConflictoPrecio.has(pn);
+                if (!tieneConflicto) return false;
+                const precioMin = preciosMinimosPorPN[pn];
+                const esPrecioMasBajo = Math.abs(item.unitPrice - precioMin) < 0.0001;
+                return !esPrecioMasBajo;
+            });
+
+            // Generar selectores de pestañas con su badge
+            const tabs = [
+                { id: 'todos', label: 'Todas las Métricas' },
+                { id: 'resistores', label: 'Resistencias (Rxx)' },
+                { id: 'capacitores', label: 'Condensadores (Cxx)' },
+                { id: 'generales', label: 'Gestión General' }
+            ];
+
+            const tabsContainer = document.getElementById('dtcTabsContainer');
+            if (tabsContainer) {
+                tabsContainer.innerHTML = '';
+                tabs.forEach(tab => {
+                    const isActive = activeDTCTab === tab.id;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.onclick = () => cambiarDTCTab(tab.id);
+                    btn.className = `px-3 py-1.5 rounded-lg border font-bold transition-all cursor-pointer ${
+                        isActive
+                            ? 'bg-amber-600 border-amber-500 text-white shadow-lg shadow-amber-950/20'
+                            : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                    }`;
+                    btn.textContent = tab.label;
+                    tabsContainer.appendChild(btn);
+                });
+            }
+
+            // Estructura de metadatos de campos DTC agrupados por su sección
             const camposDTC = [
-                {
-                    id: 'TOLERANCIAS_COSTOSAS',
-                    titulo: 'Tolerancias Más Costosas',
-                    desc: 'Pasivos con tolerancias estrechas: Resistencias &lt; 5%, condensadores no electrolíticos &lt; 10% y electrolíticos &lt; 20%.',
-                    count: tolCostosasItems.length,
-                    claseColor: 'border-rose-900/40 bg-rose-950/20 text-rose-300',
-                    queEs: 'Componentes pasivos de precisión de alta exigencia que incrementan significativamente el coste directo de materiales.',
-                    comoMejorar: 'Auditar el circuito para verificar si los requerimientos de tolerancia pueden ser flexibilizados a valores comerciales estándar (ej. unificar a 1% en resistencias generales o 20% en condensadores).'
-                },
+                // GRUPO RESISTENCIAS
                 {
                     id: 'ENCAPSULADOS_RESISTORES',
+                    grupo: 'resistores',
                     titulo: 'Encapsulados Resistencias',
                     desc: 'Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de resistencias (Rxx).',
                     count: encapResistoresItems.length,
@@ -1799,7 +2013,19 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     comoMejorar: 'Unificar los formatos superficiales (por ejemplo, estandarizar a empaque 0603 en lugar de mezclar 0402, 0603 y 0805) para reducir costes de configuración de máquina de colocación (*pick-and-place*).'
                 },
                 {
+                    id: 'VALORES_NO_ESTANDAR_RESISTORES',
+                    grupo: 'resistores',
+                    titulo: 'Valores No Estándar (E24)',
+                    desc: 'Resistencias con valores óhmicos de precisión que no pertenecen a las series comunes E24.',
+                    count: valoresNoE24Items.length,
+                    claseColor: 'border-violet-900/40 bg-violet-950/20 text-violet-300',
+                    queEs: 'Resistencias con valores específicos de precisión de las series E48, E96 o E192 (ej: 12.1k o 4.87k).',
+                    comoMejorar: 'Revisar la tolerancia del circuito para ver si es viable sustituir por el valor más cercano de la serie común E24 (ej: cambiar 12.1k a 12k).'
+                },
+                // GRUPO CONDENSADORES
+                {
                     id: 'ENCAPSULADOS_CAPACITORES',
+                    grupo: 'capacitores',
                     titulo: 'Encapsulados Condensadores',
                     desc: 'Auditoría de tamaños físicos (footprints SMT) aplicados exclusivamente a la familia de condensadores (Cxx).',
                     count: encapCapacitoresItems.length,
@@ -1809,17 +2035,62 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 },
                 {
                     id: 'DIELECTRICOS_COSTOSOS',
+                    grupo: 'capacitores',
                     titulo: 'Dieléctricos C0G/NP0',
                     desc: 'Filtra condensadores que implementan dieléctricos cerámicos de Clase 1 (ultra-estabilidad térmica y baja disipación).',
                     count: dielectricosItems.length,
-                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    claseColor: 'border-blue-900/40 bg-blue-950/20 text-blue-300',
                     queEs: 'Condensadores que usan dieléctricos C0G o NP0 por su deriva térmica casi nula y coeficiente de disipación de alta estabilidad.',
                     comoMejorar: 'Sustituir por dieléctricos de Clase 2 (X7R o X5R) en líneas de acoplo, filtrado o desacoplo de alimentación general donde la deriva de capacidad con la temperatura no sea crítica.'
+                },
+                {
+                    id: 'ESTANDARIZACION_TENSIONES',
+                    grupo: 'capacitores',
+                    titulo: 'Tensiones Condensadores',
+                    desc: 'Condensadores con el mismo valor y encapsulado físico, pero que operan a diferentes voltajes.',
+                    count: tensionesRedundantesItems.length,
+                    claseColor: 'border-blue-900/40 bg-blue-950/20 text-blue-300',
+                    queEs: 'Mezcla de tensiones de trabajo (ej: 16V, 25V, 50V) en capacitores idénticos de valor y footprint.',
+                    comoMejorar: 'Estandarizar a la tensión superior compatible (ej: usar 50V para todos) para simplificar inventario, aumentar el volumen de compra y abaratar el precio por lote.'
+                },
+                {
+                    id: 'VALORES_NO_ESTANDAR_CAPACITORES',
+                    grupo: 'capacitores',
+                    titulo: 'Valores No Estándar (E12)',
+                    desc: 'Condensadores con valores nominales de capacidad que no pertenecen a la serie estándar comercial E12.',
+                    count: valoresNoE12CapacitoresItems.length,
+                    claseColor: 'border-blue-900/40 bg-blue-950/20 text-blue-300',
+                    queEs: 'Condensadores con capacidades específicas poco comunes (ej. 1.3uF o 4.5nF) que incrementan el coste por unidad y limitan el suministro.',
+                    comoMejorar: 'Sustituir por el valor comercial E12 más próximo (ej. unificar 1.3uF a 1.2uF o 1.5uF) para optimizar costes de aprovisionamiento.'
+                },
+                // GRUPO GENERAL
+                {
+                    id: 'TOLERANCIAS_COSTOSAS',
+                    grupo: 'generales',
+                    titulo: 'Tolerancias Más Costosas',
+                    desc: 'Pasivos con tolerancias estrechas: Resistencias &lt; 5%, condensadores no electrolíticos &lt; 10% y electrolíticos &lt; 20%.',
+                    count: tolCostosasItems.length,
+                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    queEs: 'Componentes pasivos de precisión de alta exigencia que incrementan significativamente el coste directo de materiales.',
+                    comoMejorar: 'Auditar el circuito para verificar si los requerimientos de tolerancia pueden ser flexibilizados a valores comerciales estándar (ej. unificar a 1% en resistencias generales o 20% en condensadores).'
+                },
+                {
+                    id: 'PRECIOS_INCONSISTENTES',
+                    grupo: 'generales',
+                    titulo: 'Precios Inconsistentes',
+                    desc: 'Líneas del BOM que usan el mismo número de parte (Part Number) pero tienen precios unitarios diferentes.',
+                    count: preciosInconsistentesItems.length,
+                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    queEs: 'Inconsistencias de facturación o errores de cotización en el mismo componente exacto del fabricante.',
+                    comoMejorar: 'Unificar los contratos de compra con el proveedor o corregir errores tipográficos en los costes de la hoja del BOM.'
                 }
             ];
 
-            // Renderizar permanentemente las tarjetas en el grid adaptativo de 4 columnas
+            // Renderizar las tarjetas filtradas en el grid adaptativo unificado
             camposDTC.forEach(campo => {
+                // Filtrar según la pestaña activa
+                if (activeDTCTab !== 'todos' && campo.grupo !== activeDTCTab) return;
+
                 const card = document.createElement('div');
                 const esActivo = activeDTCFilter === campo.id;
                 
@@ -1857,6 +2128,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         </button>
                     </div>
                 `;
+                
                 container.appendChild(card);
             });
 
@@ -1871,6 +2143,10 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     if (activeDTCFilter === 'ENCAPSULADOS_RESISTORES') txt = "Filtro: Unificación encapsulados resistencias (Rxx)";
                     if (activeDTCFilter === 'ENCAPSULADOS_CAPACITORES') txt = "Filtro: Unificación encapsulados condensadores (Cxx)";
                     if (activeDTCFilter === 'DIELECTRICOS_COSTOSOS') txt = "Filtro: Dieléctricos más costosos (C0G/NP0)";
+                    if (activeDTCFilter === 'ESTANDARIZACION_TENSIONES') txt = "Filtro: Unificación de tensiones condensadores";
+                    if (activeDTCFilter === 'VALORES_NO_ESTANDAR_RESISTORES') txt = "Filtro: Resistencias con valores no estándar (E48/96/192)";
+                    if (activeDTCFilter === 'VALORES_NO_ESTANDAR_CAPACITORES') txt = "Filtro: Condensadores con capacidades no estándar (E12)";
+                    if (activeDTCFilter === 'PRECIOS_INCONSISTENTES') txt = "Filtro: Part Numbers con precios inconsistentes";
                     dtcActiveBadgeText.textContent = txt;
                 } else {
                     dtcActiveBadge.classList.add('hidden');
