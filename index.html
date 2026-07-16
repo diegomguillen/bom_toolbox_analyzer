@@ -1520,6 +1520,14 @@
                 title="Limpiar BOM actual">
                 Limpiar
             </button>
+            <button id="testerBtn"
+                class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg text-slate-300 transition-colors flex items-center justify-center gap-1.5 px-3"
+                title="Probar especificación de componente en el simulador">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.187-.813L9 9l.813 5.187L15 15l-5.187.813zM18 5.25L17.25 8l-.75-2.75L13.75 4.5l2.75-.75L17.25 1l.75 2.75L20.75 4.5l-2.75.75z"></path>
+                </svg>
+                <span class="text-xs font-bold uppercase tracking-wider hidden md:inline">Probar Spec</span>
+            </button>
             <button id="helpBtn"
                 class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg text-slate-300 transition-colors flex items-center justify-center"
                 title="Ayuda y Formato de Importación">
@@ -1541,7 +1549,7 @@
     </div>
 
     <!-- CONTENIDO GENERAL -->
-    <main class="flex-1 overflow-y-auto p-6 space-y-6 max-w-[1600px] w-full mx-auto">
+    <main class="flex-1 overflow-y-auto p-6 space-y-6 w-full max-w-none mx-auto">
 
         <!-- SECCIÓN DE KPI METRIC CARDS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -2514,8 +2522,12 @@
                                         title="Excluir o incluir todos los componentes">
                                 </div>
                             </th>
-                            <th class="px-6 py-4">Designador</th>
-                            <th class="px-6 py-4">Descripción</th>
+                            <th class="px-6 py-4">
+                                <div class="resize-x overflow-hidden min-w-[80px] max-w-[300px] w-24 pr-3 cursor-col-resize" style="resize: horizontal;" title="Arrastre la esquina inferior derecha de este texto para cambiar el tamaño de la columna">Designador</div>
+                            </th>
+                            <th class="px-6 py-4">
+                                <div class="resize-x overflow-hidden min-w-[150px] max-w-[800px] w-64 pr-3 cursor-col-resize" style="resize: horizontal;" title="Arrastre la esquina inferior derecha de este texto para cambiar el tamaño de la columna">Descripción</div>
+                            </th>
                             <th class="px-6 py-4 text-center">Cant. (Q_i)</th>
                             <th class="px-6 py-4">Fabricante</th>
                             <th class="px-6 py-4">Part Number</th>
@@ -2599,6 +2611,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         let partNumbersConConflictoPrecio = new Set(); // Guarda los Part Numbers con inconsistencias de precio
         let preciosMinimosPorPN = {}; // Guarda el precio unitario mínimo para cada Part Number con conflicto
         let gruposConTensionRedundanteGlobal = new Set(); // Guarda los grupos (capacidad_encapsulado) de condensadores con tensiones mezcladas
+        let mismosParametrosDifPnGlobal = new Set(); // Guarda los designadores con mismos parámetros pero diferente PN
+        let mismoValorDifParametrosGlobal = new Set(); // Guarda los designadores con mismo valor pero diferentes parámetros
 
         // INICIALIZACIÓN
         window.addEventListener('DOMContentLoaded', () => {
@@ -2705,6 +2719,132 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const card = document.getElementById('helpModalCard');
             modal.classList.add('opacity-0', 'pointer-events-none');
             card.classList.add('scale-95');
+        }
+
+        function openTesterModal() {
+            const modal = document.getElementById('testerModal');
+            const card = document.getElementById('testerModalCard');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+            runDescriptionTest();
+        }
+
+        function closeTesterModal() {
+            const modal = document.getElementById('testerModal');
+            const card = document.getElementById('testerModalCard');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
+        }
+
+        function loadTestPreset(designator, description) {
+            document.getElementById('testDesignator').value = designator;
+            document.getElementById('testDescription').value = description;
+            runDescriptionTest();
+        }
+
+        function runDescriptionTest() {
+            const desig = document.getElementById('testDesignator').value.toUpperCase().trim();
+            const desc = document.getElementById('testDescription').value;
+            
+            const dummyItem = {
+                designator: desig,
+                description: desc
+            };
+
+            const info = obtenerToleranciaYTipo(dummyItem);
+            
+            let ohms = null;
+            if (info.esResistor) {
+                ohms = obtenerValorOhmsResistencia(desc);
+            }
+            
+            let faradios = null;
+            if (info.esCapacitor) {
+                faradios = obtenerValorFaradios(info.capacidadVal);
+            }
+
+            let tipoTxt = "No detectado / Excluido";
+            if (info.esResistor) tipoTxt = "Resistencia (R)";
+            else if (info.esElectrolitico) tipoTxt = "Condensador Electrolítico (C)";
+            else if (info.esCapacitor) tipoTxt = "Condensador (C)";
+
+            let valorTxt = "-";
+            if (info.esResistor) {
+                valorTxt = ohms !== null ? `${ohms} Ω` : "No detectado";
+            } else if (info.esCapacitor) {
+                valorTxt = info.capacidadVal ? `${info.capacidadVal}` : "No detectado";
+                if (faradios !== null) {
+                    valorTxt += ` (${faradios.toExponential(2)} F)`;
+                }
+            }
+
+            document.getElementById('testParsedType').textContent = tipoTxt;
+            document.getElementById('testParsedValue').textContent = valorTxt;
+            document.getElementById('testParsedTolerance').textContent = info.tolVal !== null ? `${info.tolVal}%` : "No detectado";
+            document.getElementById('testParsedVoltage').textContent = info.tensionVal !== null ? `${info.tensionVal}V` : "No detectado";
+            document.getElementById('testParsedPackage').textContent = info.encapsuladoVal !== null ? info.encapsuladoVal : "No detectado";
+            document.getElementById('testParsedElectrolytic').textContent = info.esResistor ? "N/A" : (info.esElectrolitico ? "Sí" : "No");
+
+            const badge = document.getElementById('testStatusBadge');
+            const feedbackContainer = document.getElementById('testFeedbackContainer');
+            const feedbackTitle = document.getElementById('testFeedbackTitle');
+            const feedbackText = document.getElementById('testFeedbackText');
+
+            badge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border";
+            feedbackContainer.className = "p-3 rounded-lg border text-xs leading-relaxed space-y-1";
+
+            const esApto = (info.esResistor && ohms !== null) || (info.esCapacitor && faradios !== null);
+            const esParcial = (info.esResistor || info.esCapacitor) && !esApto;
+            const esExcluido = desig.startsWith('Q') || desig.startsWith('U') || desig.startsWith('D');
+
+            if (esApto) {
+                badge.textContent = "Apta";
+                badge.classList.add("bg-emerald-500/10", "text-emerald-400", "border-emerald-500/20");
+                feedbackContainer.classList.add("bg-emerald-500/5", "border-emerald-500/20", "text-emerald-300");
+                feedbackTitle.textContent = "✓ Componente Apto";
+                
+                let sugerenciaExtra = "";
+                if (info.esResistor) {
+                    if (!info.encapsuladoVal) sugerenciaExtra += "<li>Añade un encapsulado estándar (ej. 0603, 0805) para habilitar las métricas de unificación de footprints.</li>";
+                    if (info.tolVal === null) sugerenciaExtra += "<li>Añade la tolerancia (ej. 1%) si deseas auditar las alertas de precisión/coste.</li>";
+                } else {
+                    if (!info.encapsuladoVal) sugerenciaExtra += "<li>Añade un encapsulado estándar (ej. 0603, 0805) para las métricas de tamaño y stock redundante de tensión.</li>";
+                    if (info.tolVal === null) sugerenciaExtra += "<li>Añade la tolerancia (ej. 10%) si deseas auditar las alertas de precisión/coste.</li>";
+                    if (info.tensionVal === null) sugerenciaExtra += "<li>Añade la tensión nominal (ej. 50V) para verificar duplicidades de voltaje en el inventario.</li>";
+                }
+
+                feedbackText.innerHTML = `El motor de análisis clasificó correctamente este componente y leyó su valor base. Podrá ser analizado y normalizado en la base de datos sin problemas.${sugerenciaExtra ? `<ul class="list-disc pl-4 mt-1.5 space-y-0.5 text-slate-400 text-[11px]">${sugerenciaExtra}</ul>` : ''}`;
+            } 
+            else if (esParcial) {
+                badge.textContent = "Parcial";
+                badge.classList.add("bg-amber-500/10", "text-amber-400", "border-amber-500/20");
+                feedbackContainer.classList.add("bg-amber-500/5", "border-amber-500/20", "text-amber-300");
+                feedbackTitle.textContent = "⚠ Diagnóstico Parcial (Valor no detectado)";
+                
+                let consejo = "";
+                if (info.esResistor) {
+                    consejo = "El motor no pudo leer el valor de la resistencia. Asegúrate de declarar el valor óhmico en la descripción usando la sintaxis estándar (ej: <strong>4K7</strong>, <strong>100R</strong>, <strong>1M</strong> o decimales con letra <strong>2.2k</strong>). El sistema ignora símbolos como 'Ω' o la palabra 'ohm'.";
+                } else {
+                    consejo = "El motor no pudo leer la capacidad nominal. Asegúrate de incluir unidades estándar (<strong>uF, nF, pF, F</strong>). Se admiten los caracteres micro griegos <strong>μ</strong> y <strong>µ</strong> (ej: 10μF, 100nF).";
+                }
+                feedbackText.innerHTML = consejo;
+            } 
+            else {
+                badge.textContent = "No Apta";
+                badge.classList.add("bg-rose-500/10", "text-rose-400", "border-rose-500/20");
+                feedbackContainer.classList.add("bg-rose-500/5", "border-rose-500/20", "text-rose-300");
+                
+                if (esExcluido) {
+                    feedbackTitle.textContent = "✗ Semiconductor Excluido";
+                    let tipoSemicon = "Transistor (Q)";
+                    if (desig.startsWith('U')) tipoSemicon = "Circuito Integrado (U)";
+                    if (desig.startsWith('D')) tipoSemicon = "Diodo (D)";
+                    feedbackText.textContent = `El designador comienza con '${desig[0]}', clasificado como ${tipoSemicon}. Estos componentes están excluidos de las auditorías de pasivos (resistencias y condensadores) para evitar falsos positivos con resistencias o capacidades internas mencionadas en su descripción.`;
+                } else {
+                    feedbackTitle.textContent = "✗ Componente No Compatible";
+                    feedbackText.textContent = "El motor no ha podido clasificar este componente como resistencia o condensador. Asegúrate de que el designador comience por 'R' o 'C', o que la descripción contenga de forma explícita las palabras 'resistencia', 'resistor', 'condensador' o 'capacitor'.";
+                }
+            }
         }
 
         // CONFIGURACIÓN DE ESCUCHADORES DE EVENTOS
@@ -2817,12 +2957,23 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             });
 
             document.getElementById('helpBtn').addEventListener('click', openHelpModal);
+            document.getElementById('testerBtn').addEventListener('click', openTesterModal);
 
             document.getElementById('helpModal').addEventListener('click', (e) => {
                 if (e.target === document.getElementById('helpModal')) {
                     closeHelpModal();
                 }
             });
+
+            document.getElementById('testerModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('testerModal')) {
+                    closeTesterModal();
+                }
+            });
+
+            // Escuchadores reactivos en tiempo real para el probador
+            document.getElementById('testDesignator').addEventListener('input', runDescriptionTest);
+            document.getElementById('testDescription').addEventListener('input', runDescriptionTest);
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
@@ -2831,6 +2982,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     document.getElementById('submoduleFilterDropdown').classList.add('hidden');
                     document.getElementById('submoduleFilterArrow').classList.remove('rotate-180');
                     closeHelpModal();
+                    closeTesterModal();
                 }
             });
         }
@@ -2853,8 +3005,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const desc = item.description.toLowerCase();
             const desig = item.designator.toUpperCase();
 
-            const esResistor = desig.startsWith('R') || desc.includes('resistencia') || desc.includes('resistor');
-            const esCapacitor = desig.startsWith('C') || desc.includes('condensador') || desc.includes('capacitor');
+            const esResistor = (desig.startsWith('R') || desc.includes('resistencia') || desc.includes('resistor')) && !desig.startsWith('Q') && !desig.startsWith('U') && !desig.startsWith('D');
+            const esCapacitor = (desig.startsWith('C') || desc.includes('condensador') || desc.includes('capacitor')) && !desig.startsWith('Q') && !desig.startsWith('U') && !desig.startsWith('D');
 
             const match = desc.match(/([\d.,]+)\s*%/);
             const tolVal = match ? parseFloat(match[1].replace(',', '.')) : null;
@@ -2865,8 +3017,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const vMatch = desc.match(/\b(\d+)\s*v\b/);
             const tensionVal = vMatch ? parseInt(vMatch[1]) : null;
 
-            // EXTRAER CAPACIDAD (ej. 1uF, 10uF, 100nF)
-            const capMatch = desc.match(/\b(\d+(?:[\.,]\d+)?\s*(?:uf|nf|pf|f))\b/i);
+            // EXTRAER CAPACIDAD (ej. 1uF, 10μF, 100nF)
+            const capMatch = desc.match(/\b(\d+(?:[\.,]\d+)?\s*(?:[uμµ]f|nf|pf|f))\b/i);
             const capacidadVal = capMatch ? capMatch[1].replace(/\s+/g, '').toLowerCase() : null;
 
             // EXTRAER ENCAPSULADO SMT
@@ -2883,13 +3035,13 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         function obtenerValorBaseResistencia(desc) {
             const descL = desc.toLowerCase();
 
-            // Evitar falsos positivos con resistencias de 0 ohm / jumpers (incluye símbolo Ω unicode)
-            if (/\b0\s*(?:ohm|r|o|Ω|Ω)(?!\w)/i.test(descL) || /\b0r00?\b/i.test(descL) || descL.includes('jumper')) {
+            // Evitar falsos positivos con resistencias de 0 ohm / jumpers (incluye símbolo Ω unicode y ω lowercase)
+            if (/\b0\s*(?:ohm|r|o|Ω|Ω|ω)(?!\w)/i.test(descL) || /\b0r00?\b/i.test(descL) || descL.includes('jumper')) {
                 return null;
             }
 
-            // Buscar formato con letra en medio (ej. 4k7, 2r2, 12k1)
-            let match = descL.match(/\b(\d+)([kmr])(\d+)\b/);
+            // Buscar formato con letra en medio (ej. 4k7, 2r2, 12k1, 4Ω7, 4ω7)
+            let match = descL.match(/\b(\d+)([kmrΩΩω])(\d+)\b/);
             let valor = null;
             if (match) {
                 const entero = match[1];
@@ -2900,8 +3052,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 if (unidad === 'm') mult = 1000000;
                 valor = parseFloat(`${entero}.${decimal}`) * mult;
             } else {
-                // Buscar formato decimal normal. Usamos (?!w) para evitar que confunda 'mW' con Megaohms ('m')
-                match = descL.match(/\b(\d+(?:[\.,]\d+)?)\s*([kmro])(?!w)/);
+                // Buscar formato decimal normal. Usamos (?!\w) para evitar falsos positivos con unidades de potencia o frecuencia
+                match = descL.match(/\b(\d+(?:[\.,]\d+)?)\s*(k|m|r|o|Ω|Ω|ω|ohms?|ohm)(?!\w)/);
                 if (match) {
                     const num = parseFloat(match[1].replace(',', '.'));
                     const unidad = match[2];
@@ -2927,8 +3079,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         // AUXILIAR: EXTRACTOR Y NORMALIZADOR DE VALOR DE CAPACIDAD DE CONDENSADORES
         function obtenerValorBaseCapacidad(capStr) {
             if (!capStr) return null;
-            // capStr tiene formato ej. "1uf", "100nf", "220pf"
-            const match = capStr.match(/^([\d.,]+)\s*(uf|nf|pf|f)$/i);
+            // capStr tiene formato ej. "1uf", "10μf", "100nf", "220pf"
+            const match = capStr.match(/^([\d.,]+)\s*([uμµ]f|nf|pf|f)$/i);
             if (!match) return null;
             const num = parseFloat(match[1].replace(',', '.'));
             if (isNaN(num) || num <= 0) return null;
@@ -2942,6 +3094,58 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 valNorm *= 10;
             }
             return Math.round(valNorm * 100) / 100;
+        }
+
+        // AUXILIAR: EXTRACTOR DE VALOR ÓHMICO ABSOLUTO EN RESISTENCIAS (SIN NORMALIZAR A BASE 10-99)
+        function obtenerValorOhmsResistencia(desc) {
+            if (!desc) return null;
+            const descL = desc.toLowerCase();
+
+            // Evitar falsos positivos con resistencias de 0 ohm / jumpers
+            if (/\b0\s*(?:ohm|r|o|Ω|Ω|ω)(?!\w)/i.test(descL) || /\b0r00?\b/i.test(descL) || descL.includes('jumper')) {
+                return 0;
+            }
+
+            // Buscar formato con letra en medio (ej. 4k7, 2r2, 12k1, 4Ω7, 4ω7)
+            let match = descL.match(/\b(\d+)([kmrΩΩω])(\d+)\b/);
+            let valor = null;
+            if (match) {
+                const entero = match[1];
+                const unidad = match[2];
+                const decimal = match[3];
+                let mult = 1;
+                if (unidad === 'k') mult = 1000;
+                if (unidad === 'm') mult = 1000000;
+                valor = parseFloat(`${entero}.${decimal}`) * mult;
+            } else {
+                // Buscar formato decimal normal
+                match = descL.match(/\b(\d+(?:[\.,]\d+)?)\s*(k|m|r|o|Ω|Ω|ω|ohms?|ohm)(?!\w)/);
+                if (match) {
+                    const num = parseFloat(match[1].replace(',', '.'));
+                    const unidad = match[2];
+                    let mult = 1;
+                    if (unidad === 'k') mult = 1000;
+                    if (unidad === 'm') mult = 1000000;
+                    valor = num * mult;
+                }
+            }
+            return (valor !== null && valor >= 0) ? valor : null;
+        }
+
+        // AUXILIAR: EXTRACTOR DE CAPACIDAD ABSOLUTA EN FARADIOS (SIN NORMALIZAR A BASE 10-99)
+        function obtenerValorFaradios(capStr) {
+            if (!capStr) return null;
+            const match = capStr.match(/^([\d.,]+)\s*([uμµ]f|nf|pf|f)$/i);
+            if (!match) return null;
+            const num = parseFloat(match[1].replace(',', '.'));
+            if (isNaN(num) || num <= 0) return null;
+            const unidad = match[2].toLowerCase();
+            let mult = 1;
+            if (unidad === 'uf' || unidad === 'μf' || unidad === 'µf') mult = 1e-6;
+            if (unidad === 'nf') mult = 1e-9;
+            if (unidad === 'pf') mult = 1e-12;
+            if (unidad === 'f') mult = 1;
+            return num * mult;
         }
 
         // AUXILIAR: CALCULAR CONFLICTOS DE PRECIOS POR PART NUMBER
@@ -3847,6 +4051,12 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         const pn = item.partNumber ? item.partNumber.trim().toUpperCase() : '';
                         cumpleDTC = pn !== '' && pn !== 'N/A' && partNumbersConConflictoPrecio.has(pn);
                     }
+                    else if (activeDTCFilter === 'MISMOS_PARAMETROS_DIF_PN') {
+                        cumpleDTC = mismosParametrosDifPnGlobal.has(item.originalIndex);
+                    }
+                    else if (activeDTCFilter === 'MISMO_VALOR_DIF_PARAMETROS') {
+                        cumpleDTC = mismoValorDifParametrosGlobal.has(item.originalIndex);
+                    }
                 }
 
                 // Filtro dinámico cruzado por interacción del gráfico de Pareto
@@ -3925,8 +4135,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                             ${item.excluido ? 'checked' : ''} 
                             onchange="toggleExcluirComponente(${item.originalIndex}, this.checked)">
                     </td>
-                    <td class="px-6 py-4 font-mono font-medium text-slate-300">${item.designator}</td>
-                    <td class="px-6 py-4 text-xs text-slate-400 max-w-xs truncate" title="${item.description}">${item.description}</td>
+                    <td class="px-6 py-4 font-mono font-medium text-slate-300 max-w-0 truncate" title="${item.designator}">${item.designator}</td>
+                    <td class="px-6 py-4 text-xs text-slate-400 max-w-0 truncate" title="${item.description}">${item.description}</td>
                     <td class="px-6 py-4 text-center font-semibold text-slate-300">${item.quantity}</td>
                     <td class="px-6 py-4 text-xs text-slate-400">${item.manufacturer}</td>
                     <td class="px-6 py-4 font-mono text-xs">${partNumberHTML}</td>
@@ -4085,6 +4295,86 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 return !esPrecioMasBajo;
             });
 
+            // 9. Mismos parámetros, diferente Part Number (Resistencias y Condensadores)
+            const gruposMismosParametros = {};
+            datosFiltrados.forEach(item => {
+                const info = obtenerToleranciaYTipo(item);
+                let clave = null;
+                if (info.esResistor) {
+                    const ohms = obtenerValorOhmsResistencia(item.description);
+                    if (ohms !== null) {
+                        clave = `R_${ohms}_${info.tolVal}_${info.encapsuladoVal}`;
+                    }
+                } else if (info.esCapacitor) {
+                    const faradios = obtenerValorFaradios(info.capacidadVal);
+                    if (faradios !== null) {
+                        clave = `C_${faradios}_${info.tolVal}_${info.encapsuladoVal}_${info.tensionVal}`;
+                    }
+                }
+                if (clave) {
+                    if (!gruposMismosParametros[clave]) {
+                        gruposMismosParametros[clave] = [];
+                    }
+                    gruposMismosParametros[clave].push(item);
+                }
+            });
+
+            mismosParametrosDifPnGlobal.clear();
+            for (const [clave, items] of Object.entries(gruposMismosParametros)) {
+                const pns = new Set();
+                items.forEach(item => {
+                    const pn = (item.partNumber || '').trim().toUpperCase();
+                    if (pn && pn !== 'N/A') {
+                        pns.add(pn);
+                    }
+                });
+                if (pns.size > 1) {
+                    items.forEach(item => {
+                        mismosParametrosDifPnGlobal.add(item.originalIndex);
+                    });
+                }
+            }
+            const mismosParametrosDifPnItems = datosFiltrados.filter(item => mismosParametrosDifPnGlobal.has(item.originalIndex));
+
+            // 10. Mismo valor de resistencia o capacidad, pero diferentes parámetros (tolerancia, encapsulado, tensión, etc.)
+            const gruposMismoValor = {};
+            datosFiltrados.forEach(item => {
+                const info = obtenerToleranciaYTipo(item);
+                let claveValor = null;
+                let firmaParametros = null;
+                if (info.esResistor) {
+                    const ohms = obtenerValorOhmsResistencia(item.description);
+                    if (ohms !== null) {
+                        claveValor = `R_${ohms}`;
+                        firmaParametros = `${info.tolVal}_${info.encapsuladoVal}`;
+                    }
+                } else if (info.esCapacitor) {
+                    const faradios = obtenerValorFaradios(info.capacidadVal);
+                    if (faradios !== null) {
+                        claveValor = `C_${faradios}`;
+                        firmaParametros = `${info.tolVal}_${info.encapsuladoVal}_${info.tensionVal}`;
+                    }
+                }
+                if (claveValor) {
+                    if (!gruposMismoValor[claveValor]) {
+                        gruposMismoValor[claveValor] = [];
+                    }
+                    gruposMismoValor[claveValor].push({ item, firmaParametros });
+                }
+            });
+
+            mismoValorDifParametrosGlobal.clear();
+            for (const [claveValor, registros] of Object.entries(gruposMismoValor)) {
+                const firmas = new Set(registros.map(r => r.firmaParametros));
+                if (firmas.size > 1) {
+                    registros.forEach(r => {
+                        mismoValorDifParametrosGlobal.add(r.item.originalIndex);
+                    });
+                }
+            }
+            const mismoValorDifParametrosItems = datosFiltrados.filter(item => mismoValorDifParametrosGlobal.has(item.originalIndex));
+
+
             // Generar selectores de pestañas con su badge
             const tabs = [
                 { id: 'todos', label: 'Todas las Métricas' },
@@ -4194,6 +4484,26 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
                     queEs: 'Inconsistencias de facturación o errores de cotización en el mismo componente exacto del fabricante.',
                     comoMejorar: 'Unificar los contratos de compra con el proveedor o corregir errores tipográficos en los costes de la hoja del BOM.'
+                },
+                {
+                    id: 'MISMOS_PARAMETROS_DIF_PN',
+                    grupo: 'generales',
+                    titulo: 'Mismo Spec, Dif. Part Number',
+                    desc: 'Componentes pasivos con los mismos parámetros eléctricos pero que tienen Part Numbers distintos.',
+                    count: mismosParametrosDifPnItems.length,
+                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    queEs: 'Casos donde se compran componentes eléctricamente idénticos bajo múltiples números de parte de fabricantes.',
+                    comoMejorar: 'Consolidar las compras bajo un único Part Number seleccionado para aumentar volumen, reducir costes y simplificar el inventario.'
+                },
+                {
+                    id: 'MISMO_VALOR_DIF_PARAMETROS',
+                    grupo: 'generales',
+                    titulo: 'Mismo Valor, Dif. Parámetros',
+                    desc: 'Componentes pasivos con el mismo valor nominal (resistencia/capacidad) pero con variaciones de encapsulado, tolerancia o tensión.',
+                    count: mismoValorDifParametrosItems.length,
+                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    queEs: 'Uso de múltiples variantes físicas o de tolerancia del mismo valor nominal (ej. resistencias de 10k en formato 0603 y 0805).',
+                    comoMejorar: 'Evaluar si es posible unificar encapsulados, tensiones o tolerancias (por ejemplo, cambiar la tolerancia de 5% a 1% o usar el formato más pequeño en todos) para estandarizar el stock.'
                 }
             ];
 
@@ -4258,6 +4568,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     if (activeDTCFilter === 'VALORES_NO_ESTANDAR_RESISTORES') txt = "Filtro: Resistencias con valores no estándar (E48/96/192)";
                     if (activeDTCFilter === 'VALORES_NO_ESTANDAR_CAPACITORES') txt = "Filtro: Condensadores con capacidades no estándar (E12)";
                     if (activeDTCFilter === 'PRECIOS_INCONSISTENTES') txt = "Filtro: Part Numbers con precios inconsistentes";
+                    if (activeDTCFilter === 'MISMOS_PARAMETROS_DIF_PN') txt = "Filtro: Mismos parámetros con diferente Part Number";
+                    if (activeDTCFilter === 'MISMO_VALOR_DIF_PARAMETROS') txt = "Filtro: Mismo valor con diferentes parámetros";
                     dtcActiveBadgeText.textContent = txt;
                 } else {
                     dtcActiveBadge.classList.add('hidden');
@@ -4357,6 +4669,124 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 <button type="button" onclick="closeHelpModal()"
                     class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors">
                     Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL DE PRUEBA DE DESCRIPCIÓN (TESTER) -->
+    <div id="testerModal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="testerModalCard"
+            class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl scale-95 transition-all duration-300 relative space-y-4 text-slate-100">
+            
+            <!-- Cabecera del modal -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-white font-bold text-base">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.187-.813L9 9l.813 5.187L15 15l-5.187.813zM18 5.25L17.25 8l-.75-2.75L13.75 4.5l2.75-.75L17.25 1l.75 2.75L20.75 4.5l-2.75.75z"></path>
+                    </svg>
+                    Simulador / Probador de Descripciones
+                </div>
+                <button type="button" onclick="closeTesterModal()"
+                    class="text-slate-400 hover:text-white font-extrabold text-2xl leading-none">×</button>
+            </div>
+
+            <!-- Cuerpo del modal -->
+            <div class="space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Escribe o pega una especificación de componente para comprobar en tiempo real si el motor de análisis del programa es capaz de clasificarlo e identificar sus parámetros nominales.
+                </p>
+
+                <!-- Campos de entrada -->
+                <div class="grid grid-cols-4 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Designador</label>
+                        <input type="text" id="testDesignator" placeholder="C5" value="C5"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg p-2.5 text-xs font-mono text-center text-slate-200 focus:outline-none transition-colors">
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Descripción</label>
+                        <input type="text" id="testDescription" placeholder="Condensador 100nF, 50V, 10%, X7R, 0603" 
+                            value="Condensador 100nF, 50V, 10%, X7R, 0603"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none transition-colors">
+                    </div>
+                </div>
+
+                <!-- Presets / Ejemplos -->
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Ejemplos Rápidos</label>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button type="button" onclick="loadTestPreset('R1', 'Resistencia 4K7, 1%, 100mW, 0603')" 
+                            class="px-2 py-1 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded text-[10px] text-slate-300 transition-colors cursor-pointer">
+                            R 4K7 1% 0603
+                        </button>
+                        <button type="button" onclick="loadTestPreset('C1', 'Condensador 100nF, 50V, 10%, X7R, 0603')" 
+                            class="px-2 py-1 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded text-[10px] text-slate-300 transition-colors cursor-pointer">
+                            C 100nF 50V 0603
+                        </button>
+                        <button type="button" onclick="loadTestPreset('C2', '10μF ±10% X7R 50V 1210')" 
+                            class="px-2 py-1 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded text-[10px] text-slate-300 transition-colors cursor-pointer">
+                            C 10μF (Carácter μ)
+                        </button>
+                        <button type="button" onclick="loadTestPreset('R2', 'Resistencia de precisión 0.5Ω, 1206')" 
+                            class="px-2 py-1 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded text-[10px] text-slate-300 transition-colors cursor-pointer">
+                            R 0.5Ω (Sin Ohm)
+                        </button>
+                        <button type="button" onclick="loadTestPreset('Q1', 'Transistor NPN con resistencias R1=1K')" 
+                            class="px-2 py-1 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded text-[10px] text-slate-300 transition-colors cursor-pointer">
+                            Q1 Transistor NPN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Diagnóstico -->
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Diagnóstico del Analizador</span>
+                        <span id="testStatusBadge" class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border">Apta</span>
+                    </div>
+
+                    <!-- Lista de Parámetros -->
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                        <div class="flex justify-between border-b border-slate-900/50 pb-1">
+                            <span class="text-slate-500">Clasificación:</span>
+                            <span id="testParsedType" class="font-bold text-slate-300">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-900/50 pb-1">
+                            <span class="text-slate-500">Valor nominal:</span>
+                            <span id="testParsedValue" class="font-bold font-mono text-amber-400">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-900/50 pb-1">
+                            <span class="text-slate-500">Tolerancia:</span>
+                            <span id="testParsedTolerance" class="font-bold text-slate-300">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-900/50 pb-1">
+                            <span class="text-slate-500">Tensión / Voltaje:</span>
+                            <span id="testParsedVoltage" class="font-bold text-slate-300">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-900/50 pb-1">
+                            <span class="text-slate-500">Encapsulado:</span>
+                            <span id="testParsedPackage" class="font-bold text-slate-300">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-900/50 pb-1">
+                            <span class="text-slate-500">Electrolítico:</span>
+                            <span id="testParsedElectrolytic" class="font-bold text-slate-300">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Recomendaciones -->
+                    <div id="testFeedbackContainer" class="p-3 rounded-lg border text-xs leading-relaxed space-y-1">
+                        <div id="testFeedbackTitle" class="font-bold">Recomendación</div>
+                        <div id="testFeedbackText" class="text-slate-400">Introduce datos para comenzar el análisis.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de cierre -->
+            <div class="flex justify-end border-t border-slate-800 pt-3">
+                <button type="button" onclick="closeTesterModal()"
+                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors cursor-pointer">
+                    Cerrar
                 </button>
             </div>
         </div>
