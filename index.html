@@ -2882,6 +2882,12 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         // AUXILIAR: EXTRACTOR Y NORMALIZADOR DE VALOR ÓHMICO DE RESISTENCIAS
         function obtenerValorBaseResistencia(desc) {
             const descL = desc.toLowerCase();
+
+            // Evitar falsos positivos con resistencias de 0 ohm / jumpers (incluye símbolo Ω unicode)
+            if (/\b0\s*(?:ohm|r|o|Ω|Ω)(?!\w)/i.test(descL) || /\b0r00?\b/i.test(descL) || descL.includes('jumper')) {
+                return null;
+            }
+
             // Buscar formato con letra en medio (ej. 4k7, 2r2, 12k1)
             let match = descL.match(/\b(\d+)([kmr])(\d+)\b/);
             let valor = null;
@@ -2894,8 +2900,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 if (unidad === 'm') mult = 1000000;
                 valor = parseFloat(`${entero}.${decimal}`) * mult;
             } else {
-                // Buscar formato decimal normal con unidad al final o espacio (ej. 10k, 12.1k, 100 ohm, 22r)
-                match = descL.match(/\b(\d+(?:[\.,]\d+)?)\s*([kmro])/);
+                // Buscar formato decimal normal. Usamos (?!w) para evitar que confunda 'mW' con Megaohms ('m')
+                match = descL.match(/\b(\d+(?:[\.,]\d+)?)\s*([kmro])(?!w)/);
                 if (match) {
                     const num = parseFloat(match[1].replace(',', '.'));
                     const unidad = match[2];
