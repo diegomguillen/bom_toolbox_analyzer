@@ -4042,6 +4042,26 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 },
                 options: {
                     ...opcionesBasicasChart,
+                    onClick: function(event, elements) {
+                        if (elements && elements.length > 0) {
+                            const element = elements[0];
+                            const index = element.index;
+                            const clickedModule = labelsMod[index];
+                            if (clickedModule) {
+                                const modulos = [...new Set(bomData.map(item => item.modulo))].sort();
+                                if (selectedModules.length === 1 && selectedModules[0] === clickedModule) {
+                                    // Desactivar filtro de módulo (restablecer a todos)
+                                    selectedModules = [...modulos];
+                                    mostrarToast("Filtro de módulo desactivado.");
+                                } else {
+                                    selectedModules = [clickedModule];
+                                    mostrarToast(`Filtrando por módulo: ${clickedModule}`);
+                                }
+                                renderModulesDropdown();
+                                actualizarSelectorSubmodulos(true);
+                            }
+                        }
+                    },
                     plugins: {
                         legend: { position: 'bottom', labels: { color: '#f1f5f9', font: { size: 10, weight: '500' } } }
                     }
@@ -4063,6 +4083,40 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 options: {
                     ...opcionesBasicasChart,
                     indexAxis: 'y',
+                    onClick: function(event, elements) {
+                        if (elements && elements.length > 0) {
+                            const element = elements[0];
+                            const index = element.index;
+                            const clickedSubmodule = labelsSub[index];
+                            if (clickedSubmodule) {
+                                let submodulosDisponibles = [];
+                                if (selectedModules.length > 0) {
+                                    submodulosDisponibles = [...new Set(
+                                        bomData.filter(item => selectedModules.includes(item.modulo)).map(item => item.submodulo)
+                                    )];
+                                }
+                                submodulosDisponibles.sort();
+
+                                if (selectedSubmodules.length === 1 && selectedSubmodules[0] === clickedSubmodule) {
+                                    // Desactivar filtro de submódulo (restablecer a todos los disponibles para el módulo activo)
+                                    selectedSubmodules = [...submodulosDisponibles];
+                                    mostrarToast("Filtro de submódulo desactivado.");
+                                } else {
+                                    // Asegurar que el módulo padre de este submódulo esté seleccionado
+                                    const matchItem = bomData.find(item => item.submodulo === clickedSubmodule);
+                                    if (matchItem) {
+                                        if (!selectedModules.includes(matchItem.modulo)) {
+                                            selectedModules = [matchItem.modulo];
+                                            renderModulesDropdown();
+                                        }
+                                    }
+                                    selectedSubmodules = [clickedSubmodule];
+                                    mostrarToast(`Filtrando por submódulo: ${clickedSubmodule}`);
+                                }
+                                actualizarSelectorSubmodulos(false);
+                            }
+                        }
+                    },
                     plugins: { legend: { display: false } },
                     scales: {
                         x: { grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1', font: { size: 10, weight: '500' } } },
