@@ -2399,12 +2399,21 @@
                     </span>
                     <span>Análisis de Fabricantes de Bajo Coste (Low Cost)</span>
                 </h3>
-                <span class="text-slate-500 hover:text-slate-300 transition-colors">
-                    <svg id="lowCostCollapseChevron" class="w-4 h-4 transform transition-transform duration-200" fill="none"
-                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </span>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="openLowCostModal(event)"
+                        class="px-3 py-1 bg-slate-950/80 border border-slate-800 hover:border-slate-700 hover:bg-slate-900 rounded-lg text-xs text-slate-300 transition-all flex items-center gap-1.5 cursor-pointer select-none">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <span>Ver Base de Datos</span>
+                    </button>
+                    <span class="text-slate-500 hover:text-slate-300 transition-colors">
+                        <svg id="lowCostCollapseChevron" class="w-4 h-4 transform transition-transform duration-200" fill="none"
+                            stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </div>
             </div>
 
             <!-- Contenedor del contenido (colapsable) -->
@@ -2421,43 +2430,26 @@
                                 </svg>
                                 <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
                                     <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
-                                    Porcentaje de componentes en cada familia (Rxx, Cxx, Lxx, etc.) fabricados por marcas catalogadas como "Low Cost" en el archivo CSV del repositorio.
+                                    Cantidad de componentes por familia (Rxx, Cxx, Lxx, etc.) distinguiendo entre fabricantes de bajo coste (verde) y estándar/premium (naranja).
                                     <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
                                 </span>
                             </span>
                         </div>
-                        <p class="text-xs text-slate-400 mb-4">Porcentaje de componentes fabricados por proveedores de bajo coste por familia (ej. R, C, L...)</p>
+                        <p class="text-xs text-slate-400 mb-4">Cantidad de componentes por familia, detallando la proporción de bajo coste frente a estándar</p>
                     </div>
                     <div class="relative h-[250px] w-full flex items-center justify-center">
                         <canvas id="lowCostChart" width="456" height="250"></canvas>
                     </div>
                 </div>
 
-                <!-- Estado del CSV de Fabricantes Low Cost -->
+                <!-- Gráfico de Proporción Total Low Cost (Queso) -->
                 <div class="bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 flex flex-col justify-between">
                     <div>
-                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-1">Estado de Fabricantes Low Cost</h3>
-                        <p class="text-xs text-slate-400 mb-4">Información sobre la base de datos de fabricantes de bajo coste</p>
-                        
-                        <div class="space-y-3 mt-4 text-xs">
-                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/60">
-                                <span class="text-slate-400">Origen del CSV:</span>
-                                <span id="lowCostCsvStatus" class="font-medium text-amber-400">Intentando cargar...</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/60">
-                                <span class="text-slate-400">Fabricantes Low Cost:</span>
-                                <span id="lowCostCount" class="font-bold text-slate-200">-</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/60 space-y-1">
-                                <span class="text-slate-400 block mb-1">Listado de marcas:</span>
-                                <div id="lowCostList" class="max-h-24 overflow-y-auto text-[11px] text-slate-300 font-mono space-y-1 pr-1">
-                                    -
-                                </div>
-                            </div>
-                        </div>
+                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-1">Distribución Total</h3>
+                        <p class="text-xs text-slate-400 mb-4">Proporción general de fabricantes bajo coste en el BOM</p>
                     </div>
-                    <div class="text-[10px] text-slate-500 pt-3 border-t border-slate-800/60 mt-4 leading-relaxed">
-                        Actualice el archivo <code class="text-slate-400">low_cost_manufacturers.csv</code> en el repositorio para modificar la lista de fabricantes considerados económicos.
+                    <div class="relative h-[250px] w-full flex items-center justify-center">
+                        <canvas id="lowCostPieChart" width="200" height="250"></canvas>
                     </div>
                 </div>
             </div>
@@ -2796,34 +2788,34 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const listDiv = document.getElementById('lowCostList');
             if (listDiv) {
                 listDiv.innerHTML = '';
-                const limit = 100;
-                const visibleMfgs = lowCostManufacturers.slice(0, limit);
                 const fragment = document.createDocumentFragment();
                 
-                visibleMfgs.forEach(m => {
+                lowCostManufacturers.forEach(m => {
                     const div = document.createElement('div');
-                    div.className = "flex justify-between border-b border-slate-900/50 pb-0.5";
+                    div.className = "border-b border-slate-800/40 pb-2.5 pt-1.5 space-y-1";
                     
                     let linkHTML = m.fabricante;
                     if (m.web && m.web.startsWith('http')) {
-                        linkHTML = `<a href="${m.web}" target="_blank" class="text-blue-400 hover:underline" title="Visitar ${m.fabricante}">${m.fabricante}</a>`;
+                        linkHTML = `<a href="${m.web}" target="_blank" class="text-blue-400 hover:underline font-bold" title="Visitar ${m.fabricante}">${m.fabricante}</a>`;
+                    } else {
+                        linkHTML = `<span class="text-slate-300 font-bold">${m.fabricante}</span>`;
                     }
                     
+                    const empresaHTML = m.empresa && m.empresa !== m.fabricante 
+                        ? `<span class="text-slate-400 text-[11px] truncate max-w-[250px]" title="${m.empresa}">${m.empresa}</span>` 
+                        : '';
+                    
                     div.innerHTML = `
-                        <span class="text-slate-300 font-bold">${linkHTML}</span>
-                        <span class="text-slate-500 max-w-[120px] truncate" title="${m.empresa}">${m.empresa || '-'}</span>
+                        <div class="flex justify-between items-baseline">
+                            ${linkHTML}
+                            ${empresaHTML}
+                        </div>
+                        <p class="text-slate-500 text-[11px] leading-relaxed">${m.descripcion || 'Sin descripción disponible.'}</p>
                     `;
                     fragment.appendChild(div);
                 });
                 
                 listDiv.appendChild(fragment);
-                
-                if (lowCostManufacturers.length > limit) {
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = "text-center text-[10px] text-slate-500 pt-1.5 italic select-none";
-                    infoDiv.textContent = `... y ${lowCostManufacturers.length - limit} marcas más`;
-                    listDiv.appendChild(infoDiv);
-                }
             }
         }
 
@@ -3201,6 +3193,12 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 }
             });
 
+            document.getElementById('lowCostModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('lowCostModal')) {
+                    closeLowCostModal();
+                }
+            });
+
             // Escuchadores reactivos en tiempo real para el probador
             document.getElementById('testDesignator').addEventListener('input', runDescriptionTest);
             document.getElementById('testDescription').addEventListener('input', runDescriptionTest);
@@ -3213,6 +3211,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     document.getElementById('submoduleFilterArrow').classList.remove('rotate-180');
                     closeHelpModal();
                     closeTesterModal();
+                    closeLowCostModal();
                 }
             });
         }
@@ -4017,6 +4016,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             if (chartInstances.submodule) { chartInstances.submodule.destroy(); chartInstances.submodule = null; }
             if (chartInstances.pareto) { chartInstances.pareto.destroy(); chartInstances.pareto = null; }
             if (chartInstances.lowCost) { chartInstances.lowCost.destroy(); chartInstances.lowCost = null; }
+            if (chartInstances.lowCostPie) { chartInstances.lowCostPie.destroy(); chartInstances.lowCostPie = null; }
 
             const opcionesBasicasChart = {
                 responsive: true,
@@ -4217,15 +4217,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     return `${nombreFamilia} [Total: ${entry[1].total}]`;
                 });
                 
-                const datosLowCost = familiasOrdenadas.map(entry => {
-                    const pct = (entry[1].lowCost / entry[1].total) * 100;
-                    return Math.round(pct * 10) / 10;
-                });
-                
-                const datosResto = familiasOrdenadas.map(entry => {
-                    const pct = ((entry[1].total - entry[1].lowCost) / entry[1].total) * 100;
-                    return Math.round(pct * 10) / 10;
-                });
+                const datosLowCost = familiasOrdenadas.map(entry => entry[1].lowCost);
+                const datosResto = familiasOrdenadas.map(entry => entry[1].total - entry[1].lowCost);
                 
                 // Mostrar la sección si hay datos
                 if (familiasOrdenadas.length > 0) {
@@ -4238,13 +4231,13 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                             labels: labelsLowCost,
                             datasets: [
                                 {
-                                    label: '% Low Cost',
+                                    label: 'Bajo Coste',
                                     data: datosLowCost,
                                     backgroundColor: '#10b981', // Verde emerald
                                     borderRadius: 4
                                 },
                                 {
-                                    label: '% Resto (Estándar)',
+                                    label: 'Resto (Estándar)',
                                     data: datosResto,
                                     backgroundColor: '#f97316', // Naranja
                                     borderRadius: 4
@@ -4280,7 +4273,12 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                                     callbacks: {
                                         label: function(context) {
                                             const label = context.dataset.label;
-                                            return ` ${label}: ${context.parsed.x}%`;
+                                            const val = context.raw;
+                                            const index = context.dataIndex;
+                                            const familiaInfo = familiasOrdenadas[index];
+                                            const total = familiaInfo[1].total;
+                                            const pct = total > 0 ? Math.round((val / total) * 100 * 10) / 10 : 0;
+                                            return ` ${label}: ${val} uds. (${pct}%)`;
                                         }
                                     }
                                 }
@@ -4289,12 +4287,9 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                                 x: {
                                     stacked: true,
                                     grid: { color: '#1e293b' },
-                                    min: 0,
-                                    max: 100,
                                     ticks: {
                                         color: '#cbd5e1',
-                                        font: { size: 10, weight: '500' },
-                                        callback: function(value) { return value + '%'; }
+                                        font: { size: 10, weight: '500' }
                                     }
                                 },
                                 y: {
@@ -4304,6 +4299,63 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                                         color: '#f1f5f9',
                                         font: { size: 10, weight: '500' },
                                         autoSkip: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Calcular estadísticas globales de bajo coste para el gráfico de queso (doughnut)
+                    let totalBOMComp = 0;
+                    let totalBOMLowCost = 0;
+                    familiasOrdenadas.forEach(entry => {
+                        totalBOMComp += entry[1].total;
+                        totalBOMLowCost += entry[1].lowCost;
+                    });
+                    const totalBOMResto = totalBOMComp - totalBOMLowCost;
+
+                    const ctxPie = document.getElementById('lowCostPieChart').getContext('2d');
+                    chartInstances.lowCostPie = new Chart(ctxPie, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Bajo Coste', 'Resto (Estándar)'],
+                            datasets: [{
+                                data: [totalBOMLowCost, totalBOMResto],
+                                backgroundColor: ['#10b981', '#f97316'], // Verde emerald, Naranja
+                                borderWidth: 2,
+                                borderColor: '#0f172a'
+                            }]
+                        },
+                        options: {
+                            ...opcionesBasicasChart,
+                            cutout: '65%',
+                            onClick: function(event, elements) {
+                                if (elements && elements.length > 0) {
+                                    const element = elements[0];
+                                    const index = element.index; // 0 para Bajo Coste, 1 para Resto
+                                    const type = index === 0 ? 'low_cost' : 'resto';
+                                    filtrarTablaPorCosteGlobal(type);
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#cbd5e1',
+                                        font: { size: 9, weight: '500' },
+                                        boxWidth: 12,
+                                        padding: 8
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const val = context.raw;
+                                            const total = totalBOMComp;
+                                            const pct = total > 0 ? Math.round((val / total) * 100 * 10) / 10 : 0;
+                                            return ` ${context.label}: ${val} uds. (${pct}%)`;
+                                        }
                                     }
                                 }
                             }
@@ -4347,11 +4399,45 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 if (activeLowCostFilter) {
                     badge.classList.remove('hidden');
                     const descType = activeLowCostFilter.type === 'low_cost' ? 'Bajo Coste' : 'Estándar';
-                    badgeText.textContent = `Fam. ${activeLowCostFilter.family} (${descType})`;
+                    if (activeLowCostFilter.family === 'GLOBAL') {
+                        badgeText.textContent = `BOM total (${descType})`;
+                    } else {
+                        badgeText.textContent = `Fam. ${activeLowCostFilter.family} (${descType})`;
+                    }
                 } else {
                     badge.classList.add('hidden');
                 }
             }
+        }
+
+        // CONTROLADOR DE ACCIÓN DE FILTRADO INTERACTIVO DESDE EL GRÁFICO DE QUESO GLOBAL
+        function filtrarTablaPorCosteGlobal(type) {
+            if (activeLowCostFilter && activeLowCostFilter.family === 'GLOBAL' && activeLowCostFilter.type === type) {
+                activeLowCostFilter = null;
+                mostrarToast("Filtro de Fabricantes Low Cost desactivado.");
+            } else {
+                activeLowCostFilter = { family: 'GLOBAL', type };
+                const descType = type === 'low_cost' ? 'de bajo coste' : 'estándar/premium';
+                mostrarToast(`Filtrando toda la tabla por fabricantes ${descType}`);
+            }
+            filtrarYRenderizarTabla();
+            actualizarBadgeLowCost();
+        }
+
+        // FUNCIONES DE CONTROL DEL MODAL DE LA BASE DE DATOS DE FABRICANTES LOW COST
+        function openLowCostModal(event) {
+            if (event) event.stopPropagation();
+            const modal = document.getElementById('lowCostModal');
+            const card = document.getElementById('lowCostModalCard');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+        }
+
+        function closeLowCostModal() {
+            const modal = document.getElementById('lowCostModal');
+            const card = document.getElementById('lowCostModalCard');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
         }
 
         // CONTROLADOR DE ACCIÓN DE FILTRADO INTERACTIVO DESDE EL GRÁFICO DE PARETO
@@ -4499,16 +4585,24 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 // Filtro dinámico cruzado por interacción del gráfico de bajo coste (Low Cost)
                 let cumpleLowCost = true;
                 if (activeLowCostFilter) {
-                    const desig = item.designator.trim();
-                    const letra = desig.charAt(0).toUpperCase();
-                    if (letra !== activeLowCostFilter.family) {
-                        cumpleLowCost = false;
-                    } else {
-                        const esLow = esFabricanteLowCost(item.manufacturer);
+                    const esLow = esFabricanteLowCost(item.manufacturer);
+                    if (activeLowCostFilter.family === 'GLOBAL') {
                         if (activeLowCostFilter.type === 'low_cost') {
                             cumpleLowCost = esLow;
                         } else {
                             cumpleLowCost = !esLow;
+                        }
+                    } else {
+                        const desig = item.designator.trim();
+                        const letra = desig.charAt(0).toUpperCase();
+                        if (letra !== activeLowCostFilter.family) {
+                            cumpleLowCost = false;
+                        } else {
+                            if (activeLowCostFilter.type === 'low_cost') {
+                                cumpleLowCost = esLow;
+                            } else {
+                                cumpleLowCost = !esLow;
+                            }
                         }
                     }
                 }
@@ -4639,6 +4733,9 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     chevron.classList.remove('-rotate-90');
                     if (chartInstances.lowCost) {
                         chartInstances.lowCost.resize();
+                    }
+                    if (chartInstances.lowCostPie) {
+                        chartInstances.lowCostPie.resize();
                     }
                 }
             }
@@ -5247,6 +5344,61 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             <!-- Botón de cierre -->
             <div class="flex justify-end border-t border-slate-800 pt-3">
                 <button type="button" onclick="closeTesterModal()"
+                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors cursor-pointer">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE BASE DE DATOS DE FABRICANTES LOW COST -->
+    <div id="lowCostModal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="lowCostModalCard"
+            class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl scale-95 transition-all duration-300 relative space-y-4 text-slate-100">
+            
+            <!-- Cabecera del modal -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-white font-bold text-base">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Base de Datos de Fabricantes Low Cost
+                </div>
+                <button type="button" onclick="closeLowCostModal()"
+                    class="text-slate-400 hover:text-white font-extrabold text-2xl leading-none">×</button>
+            </div>
+
+            <!-- Cuerpo del modal -->
+            <div class="space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Información sobre las marcas y distribuidores considerados de bajo coste por el analizador. Esta lista se carga automáticamente desde el repositorio GitHub.
+                </p>
+
+                <div class="space-y-3 text-xs">
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/60">
+                        <span class="text-slate-400">Origen del CSV:</span>
+                        <span id="lowCostCsvStatus" class="font-medium text-amber-400">Intentando cargar...</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/60">
+                        <span class="text-slate-400">Total Fabricantes Registrados:</span>
+                        <span id="lowCostCount" class="font-bold text-slate-200">-</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/60 space-y-1">
+                        <span class="text-slate-400 block mb-1">Listado de marcas registradas:</span>
+                        <div id="lowCostList" class="max-h-48 overflow-y-auto text-[11px] text-slate-300 font-mono space-y-1 pr-1">
+                            -
+                        </div>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 pt-3 border-t border-slate-800/60 leading-relaxed">
+                    Para modificar o añadir marcas, actualice el archivo <code class="text-slate-400">low_cost_manufacturers.csv</code> en el repositorio de GitHub.
+                </div>
+            </div>
+
+            <!-- Botón de cierre -->
+            <div class="flex justify-end border-t border-slate-800 pt-3">
+                <button type="button" onclick="closeLowCostModal()"
                     class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors cursor-pointer">
                     Cerrar
                 </button>
