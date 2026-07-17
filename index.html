@@ -4213,6 +4213,11 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     return Math.round(pct * 10) / 10;
                 });
                 
+                const datosResto = familiasOrdenadas.map(entry => {
+                    const pct = ((entry[1].total - entry[1].lowCost) / entry[1].total) * 100;
+                    return Math.round(pct * 10) / 10;
+                });
+                
                 // Mostrar la sección si hay datos
                 if (familiasOrdenadas.length > 0) {
                     document.getElementById('lowCostSection').classList.remove('hidden');
@@ -4222,28 +4227,45 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         type: 'bar',
                         data: {
                             labels: labelsLowCost,
-                            datasets: [{
-                                label: '% Low Cost',
-                                data: datosLowCost,
-                                backgroundColor: '#10b981', // Verde emerald
-                                borderRadius: 4
-                            }]
+                            datasets: [
+                                {
+                                    label: '% Low Cost',
+                                    data: datosLowCost,
+                                    backgroundColor: '#10b981', // Verde emerald
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: '% Resto (Estándar)',
+                                    data: datosResto,
+                                    backgroundColor: '#f97316', // Naranja
+                                    borderRadius: 4
+                                }
+                            ]
                         },
                         options: {
                             ...opcionesBasicasChart,
                             indexAxis: 'y',
                             plugins: {
-                                legend: { display: false },
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        color: '#cbd5e1',
+                                        font: { size: 9, weight: '500' }
+                                    }
+                                },
                                 tooltip: {
                                     callbacks: {
                                         label: function(context) {
-                                            return ` ${context.parsed.x}% de bajo coste`;
+                                            const label = context.dataset.label;
+                                            return ` ${label}: ${context.parsed.x}%`;
                                         }
                                     }
                                 }
                             },
                             scales: {
                                 x: {
+                                    stacked: true,
                                     grid: { color: '#1e293b' },
                                     min: 0,
                                     max: 100,
@@ -4254,6 +4276,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                                     }
                                 },
                                 y: {
+                                    stacked: true,
                                     grid: { display: false },
                                     ticks: {
                                         color: '#f1f5f9',
