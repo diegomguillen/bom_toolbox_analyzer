@@ -2386,6 +2386,61 @@
 
         </div>
 
+        <!-- ANÁLISIS DE FABRICANTES LOW COST (Oculto por defecto si no se carga el CSV) -->
+        <div id="lowCostSection" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Gráfico de Fabricantes Low Cost por Familia -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 flex flex-col justify-between lg:col-span-2">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider">Fabricantes Low Cost por Familia</h3>
+                        <!-- Icono Ayuda Contextual -->
+                        <span class="group relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors z-30" onclick="toggleTooltip(event, this)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg text-[11px] leading-relaxed shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 text-slate-300 font-normal normal-case text-left">
+                                <span class="block font-bold text-blue-400 mb-1">¿Qué es?</span>
+                                Porcentaje de componentes en cada familia (Rxx, Cxx, Lxx, etc.) fabricados por marcas catalogadas como "Low Cost" en el archivo CSV del repositorio.
+                                <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></span>
+                            </span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">Porcentaje de componentes fabricados por proveedores de bajo coste por familia (ej. R, C, L...)</p>
+                </div>
+                <div class="relative h-[250px] w-full flex items-center justify-center">
+                    <canvas id="lowCostChart" width="456" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Estado del CSV de Fabricantes Low Cost -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-1">Estado de Fabricantes Low Cost</h3>
+                    <p class="text-xs text-slate-400 mb-4">Información sobre la base de datos de fabricantes de bajo coste</p>
+                    
+                    <div class="space-y-3 mt-4 text-xs">
+                        <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/40 border border-slate-800">
+                            <span class="text-slate-400">Origen del CSV:</span>
+                            <span id="lowCostCsvStatus" class="font-medium text-amber-400">Intentando cargar...</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/40 border border-slate-800">
+                            <span class="text-slate-400">Fabricantes Low Cost:</span>
+                            <span id="lowCostCount" class="font-bold text-slate-200">-</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-950/40 border border-slate-800 space-y-1">
+                            <span class="text-slate-400 block mb-1">Listado de marcas:</span>
+                            <div id="lowCostList" class="max-h-24 overflow-y-auto text-[11px] text-slate-300 font-mono space-y-1 pr-1">
+                                -
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 pt-3 border-t border-slate-800/60 mt-4 leading-relaxed">
+                    Actualice el archivo <code class="text-slate-400">low_cost_manufacturers.csv</code> en el repositorio para modificar la lista de fabricantes considerados económicos.
+                </div>
+            </div>
+        </div>
+
         <!-- ANALISIS AUTOMATIZADO Y OPORTUNIDADES DE REDUCCIÓN DE COSTES (DTC) -->
         <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-850 pb-3 cursor-pointer select-none"
@@ -2614,10 +2669,128 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         let mismosParametrosDifPnGlobal = new Set(); // Guarda los designadores con mismos parámetros pero diferente PN
         let mismoValorDifParametrosGlobal = new Set(); // Guarda los designadores con mismo valor pero diferentes parámetros
 
+        // Fabricantes Low Cost
+        let lowCostManufacturers = [];
+
+        async function cargarCSVFabricantesLowCost() {
+            try {
+                const response = await fetch('./low_cost_manufacturers.csv');
+                if (!response.ok) {
+                    throw new Error("No se pudo cargar el archivo low_cost_manufacturers.csv");
+                }
+                const csvText = await response.text();
+                parsearCSVFabricantes(csvText);
+                document.getElementById('lowCostCsvStatus').textContent = "Cargado desde repositorio";
+                document.getElementById('lowCostCsvStatus').className = "font-medium text-emerald-400";
+                
+                // Si ya hay una BOM cargada, volver a actualizar cálculos para mostrar el gráfico
+                if (bomData && bomData.length > 0) {
+                    actualizarCalculosYVistas();
+                }
+            } catch (error) {
+                console.warn("Error cargando low_cost_manufacturers.csv:", error);
+                document.getElementById('lowCostCsvStatus').textContent = "No encontrado";
+                document.getElementById('lowCostCsvStatus').className = "font-medium text-rose-400";
+                document.getElementById('lowCostCount').textContent = "0";
+                document.getElementById('lowCostList').textContent = "Ninguno";
+                document.getElementById('lowCostSection').classList.add('hidden');
+            }
+        }
+
+        function parsearCSVFabricantes(text) {
+            lowCostManufacturers = [];
+            if (!text || text.trim() === "") return;
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+            if (lines.length < 2) return;
+            
+            let delim = ',';
+            const header = lines[0];
+            if (header.includes(';') && !header.includes(',')) {
+                delim = ';';
+            }
+            
+            const cols = header.split(delim).map(c => c.trim().toLowerCase().replace(/^"|"$/g, ''));
+            const mfgIndex = cols.indexOf('fabricante');
+            const empresaIndex = cols.indexOf('empresa');
+            const webIndex = cols.indexOf('web');
+            const descIndex = cols.indexOf('descripcion');
+            
+            const idxMfg = mfgIndex !== -1 ? mfgIndex : 0;
+            const idxEmpresa = empresaIndex !== -1 ? empresaIndex : 1;
+            const idxWeb = webIndex !== -1 ? webIndex : 2;
+            const idxDesc = descIndex !== -1 ? descIndex : 3;
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                let cells = [];
+                let insideQuotes = false;
+                let buffer = '';
+                
+                for (let k = 0; k < line.length; k++) {
+                    const char = line[k];
+                    if (char === '"') {
+                        insideQuotes = !insideQuotes;
+                    } else if (char === delim && !insideQuotes) {
+                        cells.push(buffer.trim());
+                        buffer = '';
+                    } else {
+                        buffer += char;
+                    }
+                }
+                cells.push(buffer.trim());
+                
+                if (cells.length > idxMfg) {
+                    const mfgName = cells[idxMfg].replace(/^"|"$/g, '').trim();
+                    if (mfgName) {
+                        lowCostManufacturers.push({
+                            fabricante: mfgName,
+                            empresa: cells[idxEmpresa] ? cells[idxEmpresa].replace(/^"|"$/g, '').trim() : '',
+                            web: cells[idxWeb] ? cells[idxWeb].replace(/^"|"$/g, '').trim() : '',
+                            descripcion: cells[idxDesc] ? cells[idxDesc].replace(/^"|"$/g, '').trim() : ''
+                        });
+                    }
+                }
+            }
+            
+            // Actualizar interfaz
+            document.getElementById('lowCostCount').textContent = lowCostManufacturers.length;
+            const listDiv = document.getElementById('lowCostList');
+            if (listDiv) {
+                listDiv.innerHTML = '';
+                lowCostManufacturers.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between border-b border-slate-900/50 pb-0.5";
+                    
+                    let linkHTML = m.fabricante;
+                    if (m.web && m.web.startsWith('http')) {
+                        linkHTML = `<a href="${m.web}" target="_blank" class="text-blue-400 hover:underline" title="Visitar ${m.fabricante}">${m.fabricante}</a>`;
+                    }
+                    
+                    div.innerHTML = `
+                        <span class="text-slate-300 font-bold">${linkHTML}</span>
+                        <span class="text-slate-500 max-w-[120px] truncate" title="${m.empresa}">${m.empresa || '-'}</span>
+                    `;
+                    listDiv.appendChild(div);
+                });
+            }
+        }
+
+        function esFabricanteLowCost(mfgName) {
+            if (!mfgName || lowCostManufacturers.length === 0) return false;
+            const cleanMfg = mfgName.trim().toLowerCase();
+            return lowCostManufacturers.some(m => {
+                const csvMfg = m.fabricante.trim().toLowerCase();
+                return cleanMfg === csvMfg || cleanMfg.includes(csvMfg) || csvMfg.includes(cleanMfg);
+            });
+        }
+
         // INICIALIZACIÓN
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             inicializarApp("", "Ningún archivo cargado");
             configurarEventos();
+            await cargarCSVFabricantesLowCost();
         });
 
         // DISPARO DINÁMICO DE RENDERIZACIÓN DE EXPRESIONES MATEMÁTICAS (KaTeX)
@@ -3784,6 +3957,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             if (chartInstances.module) chartInstances.module.destroy();
             if (chartInstances.submodule) chartInstances.submodule.destroy();
             if (chartInstances.pareto) chartInstances.pareto.destroy();
+            if (chartInstances.lowCost) chartInstances.lowCost.destroy();
 
             const opcionesBasicasChart = {
                 responsive: true,
@@ -3926,6 +4100,115 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     }
                 }
             });
+
+            // 4. Datos para el gráfico de Fabricantes Low Cost por Familia
+            if (lowCostManufacturers.length > 0) {
+                const familias = {}; // { 'C': { total: 0, lowCost: 0 }, ... }
+                
+                bomData.forEach(item => {
+                    if (item.excluido) return;
+                    
+                    // Respetar filtros de módulo y submódulo seleccionados
+                    const cumpleMod = selectedModules.includes(item.modulo);
+                    const cumpleSub = selectedSubmodules.includes(item.submodulo);
+                    if (!cumpleMod || !cumpleSub) return;
+                    
+                    const desig = item.designator.trim();
+                    if (desig.length === 0) return;
+                    
+                    // Extraer la primera letra
+                    const letra = desig.charAt(0).toUpperCase();
+                    
+                    // Ignorar letras que no sean de la A a la Z
+                    if (!/[A-Z]/.test(letra)) return;
+                    
+                    if (!familias[letra]) {
+                        familias[letra] = { total: 0, lowCost: 0 };
+                    }
+                    
+                    familias[letra].total += item.quantity;
+                    if (esFabricanteLowCost(item.manufacturer)) {
+                        familias[letra].lowCost += item.quantity;
+                    }
+                });
+                
+                // Convertir a arreglos ordenados por el total de componentes
+                const familiasOrdenadas = Object.entries(familias)
+                    .filter(entry => entry[1].total > 0)
+                    .sort((a, b) => b[1].total - a[1].total);
+                
+                const labelsLowCost = familiasOrdenadas.map(entry => {
+                    const letra = entry[0];
+                    let nombreFamilia = letra;
+                    if (letra === 'R') nombreFamilia = 'Resistencias (R)';
+                    else if (letra === 'C') nombreFamilia = 'Condensadores (C)';
+                    else if (letra === 'L') nombreFamilia = 'Bobinas (L)';
+                    else if (letra === 'U') nombreFamilia = 'ICs (U)';
+                    else if (letra === 'D') nombreFamilia = 'Diodos (D)';
+                    else if (letra === 'Q') nombreFamilia = 'Transistores (Q)';
+                    else if (letra === 'J') nombreFamilia = 'Conectores (J)';
+                    else if (letra === 'F') nombreFamilia = 'Fusibles (F)';
+                    return `${nombreFamilia} [Total: ${entry[1].total}]`;
+                });
+                
+                const datosLowCost = familiasOrdenadas.map(entry => {
+                    const pct = (entry[1].lowCost / entry[1].total) * 100;
+                    return Math.round(pct * 10) / 10;
+                });
+                
+                // Mostrar la sección si hay datos
+                if (familiasOrdenadas.length > 0) {
+                    document.getElementById('lowCostSection').classList.remove('hidden');
+                    
+                    const ctxLowCost = document.getElementById('lowCostChart').getContext('2d');
+                    chartInstances.lowCost = new Chart(ctxLowCost, {
+                        type: 'bar',
+                        data: {
+                            labels: labelsLowCost,
+                            datasets: [{
+                                label: '% Low Cost',
+                                data: datosLowCost,
+                                backgroundColor: '#10b981', // Verde emerald
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            ...opcionesBasicasChart,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ` ${context.parsed.x}% de bajo coste`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { color: '#1e293b' },
+                                    min: 0,
+                                    max: 100,
+                                    ticks: {
+                                        color: '#cbd5e1',
+                                        font: { size: 10, weight: '500' },
+                                        callback: function(value) { return value + '%'; }
+                                    }
+                                },
+                                y: {
+                                    grid: { display: false },
+                                    ticks: { color: '#f1f5f9', font: { size: 10, weight: '500' } }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('lowCostSection').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('lowCostSection').classList.add('hidden');
+            }
         }
 
         // CONTROLADOR DE ACCIÓN DE FILTRADO INTERACTIVO DESDE EL GRÁFICO DE PARETO
