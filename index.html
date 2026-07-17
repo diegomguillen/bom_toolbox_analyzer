@@ -2694,6 +2694,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
 
         // Fabricantes Low Cost
         let lowCostManufacturers = [];
+        let lowCostSet = new Set();
 
         async function cargarCSVFabricantesLowCost() {
             try {
@@ -2777,12 +2778,22 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 }
             }
             
-            // Actualizar interfaz
+            // Re-poblar el Set para búsquedas O(1) de alto rendimiento
+            lowCostSet.clear();
+            lowCostManufacturers.forEach(m => {
+                lowCostSet.add(m.fabricante.trim().toLowerCase());
+            });
+            
+            // Actualizar interfaz con optimización de rendimiento (limitando el DOM a 100 elementos)
             document.getElementById('lowCostCount').textContent = lowCostManufacturers.length;
             const listDiv = document.getElementById('lowCostList');
             if (listDiv) {
                 listDiv.innerHTML = '';
-                lowCostManufacturers.forEach(m => {
+                const limit = 100;
+                const visibleMfgs = lowCostManufacturers.slice(0, limit);
+                const fragment = document.createDocumentFragment();
+                
+                visibleMfgs.forEach(m => {
                     const div = document.createElement('div');
                     div.className = "flex justify-between border-b border-slate-900/50 pb-0.5";
                     
@@ -2795,18 +2806,34 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         <span class="text-slate-300 font-bold">${linkHTML}</span>
                         <span class="text-slate-500 max-w-[120px] truncate" title="${m.empresa}">${m.empresa || '-'}</span>
                     `;
-                    listDiv.appendChild(div);
+                    fragment.appendChild(div);
                 });
+                
+                listDiv.appendChild(fragment);
+                
+                if (lowCostManufacturers.length > limit) {
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = "text-center text-[10px] text-slate-500 pt-1.5 italic select-none";
+                    infoDiv.textContent = `... y ${lowCostManufacturers.length - limit} marcas más`;
+                    listDiv.appendChild(infoDiv);
+                }
             }
         }
 
         function esFabricanteLowCost(mfgName) {
             if (!mfgName || lowCostManufacturers.length === 0) return false;
             const cleanMfg = mfgName.trim().toLowerCase();
-            return lowCostManufacturers.some(m => {
-                const csvMfg = m.fabricante.trim().toLowerCase();
-                return cleanMfg === csvMfg || cleanMfg.includes(csvMfg) || csvMfg.includes(cleanMfg);
-            });
+            
+            // Búsqueda directa O(1) - Cubre el 99% de los casos con alto rendimiento
+            if (lowCostSet.has(cleanMfg)) return true;
+            
+            // Búsqueda flexible fallback por si el nombre contiene/es contenido (ej. "Yageo Corporation" vs "Yageo")
+            for (let mfg of lowCostSet) {
+                if (cleanMfg.includes(mfg) || mfg.includes(cleanMfg)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         // INICIALIZACIÓN
