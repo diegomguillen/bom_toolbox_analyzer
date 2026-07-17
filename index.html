@@ -2638,9 +2638,15 @@
                         <button onclick="clearParetoFilter()"
                             class="hover:text-teal-200 font-extrabold ml-1 text-xs">×</button>
                     </span>
+                    <!-- Badge del filtro de Low Cost activo -->
+                    <span id="lowCostActiveBadge"
+                        class="hidden px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold flex items-center gap-1.5 animate-pulse text-[10px] uppercase tracking-wider">
+                        <span id="lowCostActiveBadgeText">Filtro Low Cost Activo</span>
+                        <button onclick="clearLowCostFilter()"
+                            class="hover:text-emerald-200 font-extrabold ml-1 text-xs">×</button>
+                    </span>
                 </div>
-                <div class="text-slate-500">Haga clic en el campo 'Coste Unitario' para editarlo o en las barras de
-                    Pareto para filtrar.</div>
+                <div class="text-slate-500">Haga clic en el campo 'Coste Unitario' para editarlo o en los gráficos (Pareto y Low Cost) para filtrar.</div>
             </div>
 
         </div>
@@ -2683,6 +2689,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         let isDTCCollapsed = false; // Estado de colapsado del panel DTC
         let isLowCostCollapsed = false; // Estado de colapsado del panel de bajo coste
         let activeParetoFilter = null; // Almacena la referencia consolidada clicada en Pareto
+        let activeLowCostFilter = null; // Filtro activo del gráfico de Fabricantes Low Cost
         let currentParetoVisibleItems = []; // Listado de referencias consolidadas visibles en el Pareto actual (máx 10)
         let selectedModules = [];
         let selectedSubmodules = [];
@@ -3589,6 +3596,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             calcularTensionesRedundantes();
             activeParetoFilter = null; // Restablecer filtro de Pareto
             actualizarBadgePareto();
+            activeLowCostFilter = null; // Restablecer filtro de bajo coste
+            actualizarBadgeLowCost();
 
             const dot = document.getElementById('headerStatusDot');
             if (bomData.length > 0) {
@@ -4245,6 +4254,19 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         options: {
                             ...opcionesBasicasChart,
                             indexAxis: 'y',
+                            onClick: function(event, elements) {
+                                if (elements && elements.length > 0) {
+                                    const element = elements[0];
+                                    const datasetIndex = element.datasetIndex;
+                                    const index = element.index;
+                                    const familiaInfo = familiasOrdenadas[index];
+                                    if (familiaInfo) {
+                                        const letra = familiaInfo[0];
+                                        const type = datasetIndex === 0 ? 'low_cost' : 'resto';
+                                        filtrarTablaPorLowCost(letra, type);
+                                    }
+                                }
+                            },
                             plugins: {
                                 legend: {
                                     display: true,
@@ -4292,6 +4314,43 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 }
             } else {
                 document.getElementById('lowCostSection').classList.add('hidden');
+            }
+        }
+
+        // CONTROLADOR DE ACCIÓN DE FILTRADO INTERACTIVO DESDE EL GRÁFICO DE BAJO COSTE (LOW COST)
+        function filtrarTablaPorLowCost(family, type) {
+            if (activeLowCostFilter && activeLowCostFilter.family === family && activeLowCostFilter.type === type) {
+                activeLowCostFilter = null;
+                mostrarToast("Filtro de Fabricantes Low Cost desactivado.");
+            } else {
+                activeLowCostFilter = { family, type };
+                const descType = type === 'low_cost' ? 'de bajo coste' : 'estándar/premium';
+                mostrarToast(`Filtrando tabla por familia '${family}' (${descType})`);
+            }
+            filtrarYRenderizarTabla();
+            actualizarBadgeLowCost();
+        }
+
+        // LIMPIEZA MANUAL DEL FILTRO DE BAJO COSTE DESDE EL BADGE DE LA TABLA
+        function clearLowCostFilter() {
+            activeLowCostFilter = null;
+            filtrarYRenderizarTabla();
+            actualizarBadgeLowCost();
+            mostrarToast("Filtro de Fabricantes Low Cost desactivado.");
+        }
+
+        // CONTROL VISUAL DEL BADGE DE FILTRADO DE BAJO COSTE
+        function actualizarBadgeLowCost() {
+            const badge = document.getElementById('lowCostActiveBadge');
+            const badgeText = document.getElementById('lowCostActiveBadgeText');
+            if (badge && badgeText) {
+                if (activeLowCostFilter) {
+                    badge.classList.remove('hidden');
+                    const descType = activeLowCostFilter.type === 'low_cost' ? 'Bajo Coste' : 'Estándar';
+                    badgeText.textContent = `Fam. ${activeLowCostFilter.family} (${descType})`;
+                } else {
+                    badge.classList.add('hidden');
+                }
             }
         }
 
@@ -4437,7 +4496,24 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     }
                 }
 
-                return cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto;
+                // Filtro dinámico cruzado por interacción del gráfico de bajo coste (Low Cost)
+                let cumpleLowCost = true;
+                if (activeLowCostFilter) {
+                    const desig = item.designator.trim();
+                    const letra = desig.charAt(0).toUpperCase();
+                    if (letra !== activeLowCostFilter.family) {
+                        cumpleLowCost = false;
+                    } else {
+                        const esLow = esFabricanteLowCost(item.manufacturer);
+                        if (activeLowCostFilter.type === 'low_cost') {
+                            cumpleLowCost = esLow;
+                        } else {
+                            cumpleLowCost = !esLow;
+                        }
+                    }
+                }
+
+                return cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto && cumpleLowCost;
             });
 
             // 2. Ordenar por part number si el filtro de Precios Inconsistentes está activo
