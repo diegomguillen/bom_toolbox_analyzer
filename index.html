@@ -4057,7 +4057,14 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     plugins: { legend: { display: false } },
                     scales: {
                         x: { grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1', font: { size: 10, weight: '500' } } },
-                        y: { grid: { display: false }, ticks: { color: '#f1f5f9', font: { size: 10, weight: '500' } } }
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#f1f5f9',
+                                font: { size: 10, weight: '500' },
+                                autoSkip: false
+                            }
+                        }
                     }
                 }
             });
@@ -4248,7 +4255,11 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                                 },
                                 y: {
                                     grid: { display: false },
-                                    ticks: { color: '#f1f5f9', font: { size: 10, weight: '500' } }
+                                    ticks: {
+                                        color: '#f1f5f9',
+                                        font: { size: 10, weight: '500' },
+                                        autoSkip: false
+                                    }
                                 }
                             }
                         }
