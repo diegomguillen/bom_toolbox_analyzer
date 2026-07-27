@@ -1493,6 +1493,18 @@
                 <span>Cargar BOM (.csv)</span>
                 <input type="file" id="csvFileInput" accept=".csv" class="hidden">
             </label>
+            <label
+                class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg cursor-pointer text-sm font-medium transition-colors"
+                title="Cargar notas previas en formato JSON">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20">
+                    </path>
+                </svg>
+                <span>Cargar Notas (.json)</span>
+                <input type="file" id="jsonNotesInput" accept=".json" class="hidden">
+            </label>
             <button id="loadExampleBtn"
                 class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg text-sm font-medium text-slate-300 transition-colors flex items-center gap-2"
                 title="Cargar BOM de prueba para demostración">
@@ -1504,16 +1516,16 @@
                 </svg>
                 <span>Cargar Ejemplo</span>
             </button>
-            <button id="exportBtn"
+            <button id="saveNotesBtn"
                 class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-600 border border-emerald-500/20 rounded-lg text-sm font-medium text-white transition-colors flex items-center gap-2"
-                title="Exportar BOM modificada">
+                title="Guardar notas en archivo JSON">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
                     </path>
                 </svg>
-                <span>Exportar CSV</span>
+                <span>Guardar Notas</span>
             </button>
             <button id="resetBtn"
                 class="px-4 py-2 bg-rose-950/30 hover:bg-rose-950/50 text-rose-400 border border-rose-900/50 hover:border-rose-800 rounded-lg text-sm font-medium transition-colors"
@@ -2685,6 +2697,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         let currentParetoVisibleItems = []; // Listado de referencias consolidadas visibles en el Pareto actual (máx 10)
         let selectedModules = [];
         let selectedSubmodules = [];
+        let bomNotes = {}; // Estructura para almacenar notas asociadas a cada fila
+        let activeNotesKey = ""; // Guarda la clave de la fila cuyas notas están siendo gestionadas
         let partNumbersConConflictoPrecio = new Set(); // Guarda los Part Numbers con inconsistencias de precio
         let preciosMinimosPorPN = {}; // Guarda el precio unitario mínimo para cada Part Number con conflicto
         let gruposConTensionRedundanteGlobal = new Set(); // Guarda los grupos (capacidad_encapsulado) de condensadores con tensiones mezcladas
@@ -2943,6 +2957,161 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             card.classList.add('scale-95');
         }
 
+        // GESTIÓN DE NOTAS POR FILA
+        function openNotesModal(designator, modulo, submodulo) {
+            activeNotesKey = `${designator}_${modulo}_${submodulo}`;
+            document.getElementById('notesModalTitle').textContent = `Notas de ${designator}`;
+            document.getElementById('notesModalSubtitle').textContent = `Módulo: ${modulo} | Submódulo: ${submodulo}`;
+            document.getElementById('newNoteText').value = "";
+            renderModalNotas();
+            
+            const modal = document.getElementById('notesModal');
+            const card = document.getElementById('notesModalCard');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+        }
+
+        function closeNotesModal() {
+            const modal = document.getElementById('notesModal');
+            const card = document.getElementById('notesModalCard');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
+            activeNotesKey = "";
+        }
+
+        function renderModalNotas() {
+            const container = document.getElementById('notesListContainer');
+            container.innerHTML = "";
+            
+            const notes = bomNotes[activeNotesKey] || [];
+            
+            if (notes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-slate-500 text-xs">
+                        <svg class="w-8 h-8 mx-auto mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        No hay notas guardadas para este componente.
+                    </div>
+                `;
+                return;
+            }
+            
+            notes.forEach(note => {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = "p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-2 relative group";
+                noteDiv.id = `note-container-${note.id}`;
+                
+                noteDiv.innerHTML = `
+                    <div id="note-view-${note.id}" class="flex justify-between items-start gap-3">
+                        <div class="space-y-1 flex-1">
+                            <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">${escapeHTML(note.text)}</p>
+                            <span class="text-[9px] text-slate-500 block">${new Date(note.date).toLocaleString()}</span>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="activarEdicionNota('${note.id}')" class="p-1 text-slate-400 hover:text-blue-400 transition-colors cursor-pointer" title="Editar nota">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                            </button>
+                            <button onclick="eliminarNota('${note.id}')" class="p-1 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer" title="Eliminar nota">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="note-edit-${note.id}" class="hidden space-y-2">
+                        <textarea id="note-textarea-${note.id}" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-lg p-2 text-xs text-slate-200 focus:outline-none transition-colors" rows="2">${escapeHTML(note.text)}</textarea>
+                        <div class="flex justify-end gap-1.5">
+                            <button onclick="cancelarEdicionNota('${note.id}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-750 border border-slate-700 rounded text-[10px] text-slate-300 font-bold transition-colors cursor-pointer">Cancelar</button>
+                            <button onclick="guardarEdicionNota('${note.id}')" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-[10px] text-white font-bold transition-colors cursor-pointer">Guardar</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(noteDiv);
+            });
+        }
+
+        function agregarNotaActual() {
+            const textInput = document.getElementById('newNoteText');
+            const text = textInput.value.trim();
+            if (!text) {
+                mostrarToast("La nota no puede estar vacía.", false);
+                return;
+            }
+            
+            if (!bomNotes[activeNotesKey]) {
+                bomNotes[activeNotesKey] = [];
+            }
+            
+            const newNote = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                text: text,
+                date: new Date().toISOString()
+            };
+            
+            bomNotes[activeNotesKey].push(newNote);
+            textInput.value = "";
+            
+            renderModalNotas();
+            filtrarYRenderizarTabla();
+            mostrarToast("Nota añadida correctamente.");
+        }
+
+        function eliminarNota(noteId) {
+            if (!activeNotesKey || !bomNotes[activeNotesKey]) return;
+            
+            bomNotes[activeNotesKey] = bomNotes[activeNotesKey].filter(note => note.id !== noteId);
+            
+            if (bomNotes[activeNotesKey].length === 0) {
+                delete bomNotes[activeNotesKey];
+            }
+            
+            renderModalNotas();
+            filtrarYRenderizarTabla();
+            mostrarToast("Nota eliminada correctamente.");
+        }
+
+        function activarEdicionNota(noteId) {
+            document.getElementById(`note-view-${noteId}`).classList.add('hidden');
+            document.getElementById(`note-edit-${noteId}`).classList.remove('hidden');
+        }
+
+        function cancelarEdicionNota(noteId) {
+            document.getElementById(`note-view-${noteId}`).classList.remove('hidden');
+            document.getElementById(`note-edit-${noteId}`).classList.add('hidden');
+        }
+
+        function guardarEdicionNota(noteId) {
+            if (!activeNotesKey || !bomNotes[activeNotesKey]) return;
+            
+            const newText = document.getElementById(`note-textarea-${noteId}`).value.trim();
+            if (!newText) {
+                mostrarToast("El texto de la nota no puede estar vacío.", false);
+                return;
+            }
+            
+            const note = bomNotes[activeNotesKey].find(n => n.id === noteId);
+            if (note) {
+                note.text = newText;
+                note.date = new Date().toISOString();
+            }
+            
+            renderModalNotas();
+            filtrarYRenderizarTabla();
+            mostrarToast("Nota modificada correctamente.");
+        }
+
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function openTesterModal() {
             const modal = document.getElementById('testerModal');
             const card = document.getElementById('testerModalCard');
@@ -3085,42 +3254,78 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 reader.readAsText(file);
             });
 
-            // Botón de exportación a CSV optimizado
-            document.getElementById('exportBtn').addEventListener('click', () => {
+            // Carga de archivo JSON de notas
+            const jsonNotesInput = document.getElementById('jsonNotesInput');
+            jsonNotesInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const parsedNotes = JSON.parse(event.target.result);
+                        if (typeof parsedNotes === 'object' && parsedNotes !== null) {
+                            let valid = true;
+                            for (const key in parsedNotes) {
+                                if (!Array.isArray(parsedNotes[key])) {
+                                    valid = false;
+                                    break;
+                                }
+                            }
+                            if (valid) {
+                                bomNotes = parsedNotes;
+                                filtrarYRenderizarTabla();
+                                mostrarToast("Notas cargadas e integradas correctamente.");
+                            } else {
+                                mostrarToast("El formato del archivo de notas no es válido.", false);
+                            }
+                        } else {
+                            mostrarToast("El archivo no contiene un JSON válido para notas.", false);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        mostrarToast("Error al procesar el archivo JSON de notas.", false);
+                    }
+                    jsonNotesInput.value = "";
+                };
+                reader.readAsText(file);
+            });
+
+            // Botón de guardar notas (JSON)
+            document.getElementById('saveNotesBtn').addEventListener('click', () => {
                 if (bomData.length === 0) {
-                    mostrarToast("No hay datos para exportar.", false);
+                    mostrarToast("No hay datos cargados para guardar notas.", false);
                     return;
                 }
-                let csvContent = "Designator;Description;Quantity;Manufacturer;PartNumber;Unit Price;Total Price;Modulo;SubModulo;Modelo;\r\n";
-                bomData.forEach(item => {
-                    if (item.excluido) return;
-                    const uPrice = item.unitPrice.toFixed(4).replace('.', ',');
-                    const tPrice = item.totalPrice.toFixed(4).replace('.', ',');
-                    csvContent += `"${item.designator}";"${item.description}";${item.quantity};"${item.manufacturer}";"${item.partNumber}";${uPrice};${tPrice};"${item.modulo}";"${item.submodulo}";"${item.modelo}"\r\n`;
-                });
+                const baseTitle = document.getElementById('headerBomTitle').textContent || 'BOM';
+                const cleanBaseName = baseTitle.endsWith('.csv') ? baseTitle.substring(0, baseTitle.length - 4) : baseTitle;
+                const jsonFileName = `${cleanBaseName}_notas.json`;
 
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const jsonContent = JSON.stringify(bomNotes, null, 2);
+                const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.setAttribute("href", url);
-                link.setAttribute("download", "BOM_optimizado.csv");
+                link.setAttribute("download", jsonFileName);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                mostrarToast("BOM exportada correctamente a 'BOM_optimizado.csv'.");
+                mostrarToast(`Notas guardadas correctamente en '${jsonFileName}'.`);
             });
 
             // Botón para cargar BOM de ejemplo
             document.getElementById('loadExampleBtn').addEventListener('click', () => {
                 inicializarApp(defaultBOM_CSV, 'BOM de Ejemplo.csv');
+                bomNotes = {};
                 mostrarToast("Se ha cargado el BOM de ejemplo.");
             });
 
             // Botón de restablecer (ahora limpia)
             document.getElementById('resetBtn').addEventListener('click', () => {
                 inicializarApp("", "Ningún archivo cargado");
-                mostrarToast("Se han limpiado los datos del BOM.");
+                bomNotes = {};
+                mostrarToast("Se han limpiado los datos del BOM y las notas.");
             });
 
             // Filtros de búsqueda y selectores
@@ -3199,6 +3404,12 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 }
             });
 
+            document.getElementById('notesModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('notesModal')) {
+                    closeNotesModal();
+                }
+            });
+
             // Escuchadores reactivos en tiempo real para el probador
             document.getElementById('testDesignator').addEventListener('input', runDescriptionTest);
             document.getElementById('testDescription').addEventListener('input', runDescriptionTest);
@@ -3212,6 +3423,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     closeHelpModal();
                     closeTesterModal();
                     closeLowCostModal();
+                    closeNotesModal();
                 }
             });
         }
@@ -4681,6 +4893,10 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 const row = document.createElement('tr');
                 row.className = `hover:bg-slate-800/40 transition-all duration-200 group ${item.excluido ? 'opacity-40' : ''}`;
 
+                const notesKey = `${item.designator}_${item.modulo}_${item.submodulo}`;
+                const hasNotes = bomNotes[notesKey] && bomNotes[notesKey].length > 0;
+                const iconColorClass = hasNotes ? 'text-emerald-500 hover:text-emerald-400' : 'text-slate-500 hover:text-slate-400';
+
                 let partNumberHTML = `<span class="text-slate-500 select-none">N/A</span>`;
                 if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
                     const searchUrl = `https://www.unikeyic.com/search?keyword=${encodeURIComponent(item.partNumber)}`;
@@ -4726,7 +4942,19 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                             ${item.excluido ? 'checked' : ''} 
                             onchange="toggleExcluirComponente(${item.originalIndex}, this.checked)">
                     </td>
-                    <td class="px-6 py-4 font-mono font-medium text-slate-300 max-w-0 truncate" title="${item.designator}">${item.designator}</td>
+                    <td class="px-6 py-4 font-mono font-medium text-slate-300 max-w-0 truncate">
+                        <div class="flex items-center gap-1.5 justify-start">
+                            <span title="${item.designator}">${item.designator}</span>
+                            <button type="button" 
+                                onclick="openNotesModal('${item.designator.replace(/'/g, "\\'")}', '${item.modulo.replace(/'/g, "\\'")}', '${item.submodulo.replace(/'/g, "\\'")}')" 
+                                class="focus:outline-none transition-colors duration-150 shrink-0 ${iconColorClass}" 
+                                title="${hasNotes ? 'Ver/Editar notas (Tiene notas)' : 'Añadir notas'}">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
                     <td class="px-6 py-4 text-xs text-slate-400 max-w-0 truncate" title="${item.description}">${item.description}</td>
                     <td class="px-6 py-4 text-center font-semibold text-slate-300">${item.quantity}</td>
                     <td class="px-6 py-4 text-xs text-slate-400">${item.manufacturer}</td>
@@ -5453,6 +5681,57 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             <!-- Botón de cierre -->
             <div class="flex justify-end border-t border-slate-800 pt-3">
                 <button type="button" onclick="closeLowCostModal()"
+                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors cursor-pointer">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE NOTAS POR FILA -->
+    <div id="notesModal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="notesModalCard"
+            class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl scale-95 transition-all duration-300 relative space-y-4 text-slate-100">
+            
+            <!-- Cabecera del modal -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2 text-white font-bold text-base">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span id="notesModalTitle">Notas del Componente</span>
+                    </div>
+                    <span id="notesModalSubtitle" class="text-[11px] text-slate-400 mt-1 font-mono"></span>
+                </div>
+                <button type="button" onclick="closeNotesModal()"
+                    class="text-slate-400 hover:text-white font-extrabold text-2xl leading-none">×</button>
+            </div>
+
+            <!-- Cuerpo del modal -->
+            <div class="space-y-4">
+                <div id="notesListContainer" class="max-h-60 overflow-y-auto space-y-3 pr-1">
+                    <!-- Las notas se renderizan aquí dinámicamente -->
+                </div>
+
+                <!-- Formulario de Nueva Nota -->
+                <div class="border-t border-slate-800 pt-3 space-y-2">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Nueva Nota</label>
+                    <div class="flex gap-2">
+                        <textarea id="newNoteText" placeholder="Escribe aquí la nota..." rows="2"
+                            class="flex-1 bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none transition-colors resize-none"></textarea>
+                        <button type="button" onclick="agregarNotaActual()"
+                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-600 border border-emerald-500/20 rounded-lg text-xs font-bold text-white transition-colors flex items-center justify-center shrink-0">
+                            Añadir
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones del modal -->
+            <div class="flex justify-end border-t border-slate-800 pt-3">
+                <button type="button" onclick="closeNotesModal()"
                     class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition-colors cursor-pointer">
                     Cerrar
                 </button>
