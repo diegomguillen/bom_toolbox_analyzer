@@ -2715,6 +2715,8 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         let gruposConTensionRedundanteGlobal = new Set(); // Guarda los grupos (capacidad_encapsulado) de condensadores con tensiones mezcladas
         let mismosParametrosDifPnGlobal = new Set(); // Guarda los designadores con mismos parámetros pero diferente PN
         let mismoValorDifParametrosGlobal = new Set(); // Guarda los designadores con mismo valor pero diferentes parámetros
+        let preciosAtipicosGlobal = new Set(); // Guarda los originalIndex de componentes con precios unitarios atípicos (outliers)
+        let preciosAtipicosDetalle = {}; // Guarda la información estadística detallada para el tooltip de cada outlier
 
         // Fabricantes Low Cost
         let lowCostManufacturers = [];
@@ -4872,6 +4874,9 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     else if (activeDTCFilter === 'MISMO_VALOR_DIF_PARAMETROS') {
                         cumpleDTC = mismoValorDifParametrosGlobal.has(item.originalIndex);
                     }
+                    else if (activeDTCFilter === 'PRECIOS_ATIPICOS') {
+                        cumpleDTC = preciosAtipicosGlobal.has(item.originalIndex);
+                    }
                 }
 
                 // Filtro dinámico cruzado por interacción del gráfico de Pareto
@@ -4973,22 +4978,39 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 let celdaPrecioClase = "px-6 py-4 font-mono text-slate-300";
                 let unitPriceHTML = item.unitPrice.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
-                if (tienePrecioInconsistente) {
-                    const esPrecioMasBajo = Math.abs(item.unitPrice - preciosMinimosPorPN[pnLimpio]) < 0.0001;
-                    if (esPrecioMasBajo) {
-                        // Resaltar en fondo verde sutil la celda, con borde izquierdo verde y texto verde/emerald
-                        celdaPrecioClase = "px-6 py-4 font-mono text-emerald-400 bg-emerald-500/5 font-semibold border-l-2 border-emerald-500/40";
-                        unitPriceHTML = `
-                            <div class="flex items-center justify-between gap-2" title="Mejor precio: Este es el precio más bajo registrado para este Part Number">
-                                <span>${unitPriceHTML}</span>
-                                <span class="text-emerald-500 cursor-help shrink-0">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </span>
-                            </div>
-                        `;
-                    }
+                const esAtipico = (activeDTCFilter === 'PRECIOS_ATIPICOS') && preciosAtipicosGlobal.has(item.originalIndex);
+                const esPrecioMasBajo = tienePrecioInconsistente && (Math.abs(item.unitPrice - preciosMinimosPorPN[pnLimpio]) < 0.0001);
+
+                if (esPrecioMasBajo) {
+                    // Resaltar en fondo verde sutil la celda, con borde izquierdo verde y texto verde/emerald
+                    celdaPrecioClase = "px-6 py-4 font-mono text-emerald-400 bg-emerald-500/5 font-semibold border-l-2 border-emerald-500/40";
+                    unitPriceHTML = `
+                        <div class="flex items-center justify-between gap-2" title="Mejor precio: Este es el precio más bajo registrado para este Part Number">
+                            <span>${unitPriceHTML}</span>
+                            <span class="text-emerald-500 cursor-help shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    `;
+                } else if (esAtipico) {
+                    const detalle = preciosAtipicosDetalle[item.originalIndex];
+                    const zText = detalle.zScore ? `Z-Score: ${detalle.zScore.toFixed(2)}` : 'Z-Score: N/A';
+                    const limiteText = detalle.iqrLimit ? `Límite IQR (Q3 + 1.5*IQR): ${detalle.iqrLimit.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} €` : '';
+                    const tooltipMsg = `Precio atípico en su familia '${detalle.grupo}':\n- ${zText}\n- ${limiteText}`;
+                    
+                    celdaPrecioClase = "px-6 py-4 font-mono text-rose-400 bg-rose-500/5 font-semibold border-l-2 border-rose-500/40";
+                    unitPriceHTML = `
+                        <div class="flex items-center justify-between gap-2 cursor-help" title="${tooltipMsg}">
+                            <span>${unitPriceHTML}</span>
+                            <span class="text-rose-400 shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    `;
                 }
 
                 row.innerHTML = `
@@ -5270,6 +5292,63 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             }
             const mismoValorDifParametrosItems = datosFiltrados.filter(item => mismoValorDifParametrosGlobal.has(item.originalIndex));
 
+            // 11. Detección de Valores Atípicos (Outliers) de Precios por Familia
+            preciosAtipicosGlobal.clear();
+            preciosAtipicosDetalle = {};
+
+            // Agrupar componentes por el prefijo de su designador (ej: R, C, U, D, Q, etc.)
+            const gruposPorFamilia = {};
+            datosFiltrados.forEach(item => {
+                if (item.unitPrice <= 0) return; // Omitir componentes sin coste para no sesgar las medias
+                const match = item.designator.match(/^[a-zA-Z]+/);
+                const prefix = match ? match[0].toUpperCase() : 'OTROS';
+                if (!gruposPorFamilia[prefix]) {
+                    gruposPorFamilia[prefix] = [];
+                }
+                gruposPorFamilia[prefix].push(item);
+            });
+
+            // Procesar cada familia para buscar outliers si tiene suficientes datos (mínimo 5 componentes)
+            for (const [familia, items] of Object.entries(gruposPorFamilia)) {
+                if (items.length < 5) continue;
+
+                // Precios ordenados para calcular cuartiles
+                const precios = items.map(item => item.unitPrice).sort((a, b) => a - b);
+                
+                // Cálculo de cuartiles
+                const q1 = precios[Math.floor(precios.length * 0.25)];
+                const q3 = precios[Math.floor(precios.length * 0.75)];
+                const iqr = q3 - q1;
+                const umbralSuperior = q3 + 1.5 * iqr;
+
+                // Cálculo de media y desviación estándar para Z-Score
+                const n = precios.length;
+                const media = precios.reduce((sum, val) => sum + val, 0) / n;
+                const sumaDiferenciasCuadrado = precios.reduce((sum, val) => sum + Math.pow(val - media, 2), 0);
+                const desviacionEstandar = Math.sqrt(sumaDiferenciasCuadrado / n);
+
+                // Evaluar outliers
+                items.forEach(item => {
+                    // Criterio: supera el umbral IQR y hay un desvío absoluto significativo (> 0.05 €) para evitar falsos positivos en céntimos
+                    const superaIqr = item.unitPrice > umbralSuperior && (item.unitPrice - q3) > 0.05;
+                    
+                    if (superaIqr) {
+                        preciosAtipicosGlobal.add(item.originalIndex);
+                        const zScore = desviacionEstandar > 0 ? (item.unitPrice - media) / desviacionEstandar : 0;
+                        preciosAtipicosDetalle[item.originalIndex] = {
+                            zScore: zScore,
+                            iqrLimit: umbralSuperior,
+                            grupo: familia,
+                            q3: q3,
+                            iqr: iqr,
+                            media: media
+                        };
+                    }
+                });
+            }
+
+            const preciosAtipicosItems = datosFiltrados.filter(item => preciosAtipicosGlobal.has(item.originalIndex));
+
 
             // Generar selectores de pestañas con su badge
             const tabs = [
@@ -5400,6 +5479,16 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
                     queEs: 'Uso de múltiples variantes físicas o de tolerancia del mismo valor nominal (ej. resistencias de 10k en formato 0603 y 0805).',
                     comoMejorar: 'Evaluar si es posible unificar encapsulados, tensiones o tolerancias (por ejemplo, cambiar la tolerancia de 5% a 1% o usar el formato más pequeño en todos) para estandarizar el stock.'
+                },
+                {
+                    id: 'PRECIOS_ATIPICOS',
+                    grupo: 'generales',
+                    titulo: 'Precios Atípicos (Outliers)',
+                    desc: 'Componentes cuyo precio unitario se desvía de forma anómala del resto de su categoría.',
+                    count: preciosAtipicosItems.length,
+                    claseColor: 'border-emerald-900/40 bg-emerald-950/20 text-emerald-300',
+                    queEs: 'Identificación de precios unitarios que superan el umbral estadístico IQR (Q3 + 1.5 * IQR) o tienen un Z-Score elevado dentro de su misma familia (resistencias, condensadores, integrados, etc.).',
+                    comoMejorar: 'Verificar si existe un error tipográfico en la introducción del precio o si el componente seleccionado tiene un sobrecoste injustificado que pueda optimizarse.'
                 }
             ];
 
@@ -5466,6 +5555,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                     if (activeDTCFilter === 'PRECIOS_INCONSISTENTES') txt = "Filtro: Part Numbers con precios inconsistentes";
                     if (activeDTCFilter === 'MISMOS_PARAMETROS_DIF_PN') txt = "Filtro: Mismos parámetros con diferente Part Number";
                     if (activeDTCFilter === 'MISMO_VALOR_DIF_PARAMETROS') txt = "Filtro: Mismo valor con diferentes parámetros";
+                    if (activeDTCFilter === 'PRECIOS_ATIPICOS') txt = "Filtro: Precios atípicos (outliers)";
                     dtcActiveBadgeText.textContent = txt;
                 } else {
                     dtcActiveBadge.classList.add('hidden');
