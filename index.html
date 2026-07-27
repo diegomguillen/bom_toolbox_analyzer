@@ -2585,6 +2585,17 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Filtro por Notas Abiertas / Por Cerrar -->
+                    <label class="flex items-center gap-2 px-3 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-lg text-sm text-slate-300 transition-colors cursor-pointer select-none"
+                        title="Mostrar únicamente componentes que tienen notas en estado 'Creada' (pendientes de cerrar)">
+                        <input type="checkbox" id="pendingNotesFilter" onchange="filtrarYRenderizarTabla()"
+                            class="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500 focus:ring-offset-slate-950 w-4 h-4 cursor-pointer">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            Notas por cerrar
+                        </span>
+                    </label>
                 </div>
             </div>
 
@@ -3002,11 +3013,23 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 noteDiv.className = "p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-2 relative group";
                 noteDiv.id = `note-container-${note.id}`;
                 
+                const noteStatus = note.status || 'creada';
+                const isManaged = noteStatus === 'gestionada';
+                
                 noteDiv.innerHTML = `
                     <div id="note-view-${note.id}" class="flex justify-between items-start gap-3">
-                        <div class="space-y-1 flex-1">
+                        <div class="space-y-1.5 flex-1">
                             <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">${escapeHTML(note.text)}</p>
-                            <span class="text-[9px] text-slate-500 block">${new Date(note.date).toLocaleString()}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-[9px] text-slate-500">${new Date(note.date).toLocaleString()}</span>
+                                <label class="flex items-center gap-1 cursor-pointer select-none">
+                                    <input type="checkbox" onchange="toggleEstadoNota('${note.id}', this.checked)" ${isManaged ? 'checked' : ''} 
+                                        class="rounded border-slate-800 bg-slate-950 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-slate-900 w-3.5 h-3.5 cursor-pointer">
+                                    <span class="text-[10px] font-semibold ${ isManaged ? 'text-emerald-500' : 'text-amber-500' }">
+                                        ${isManaged ? 'Gestionada' : 'Creada (Pendiente)'}
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
                             <button onclick="activarEdicionNota('${note.id}')" class="p-1 text-slate-400 hover:text-blue-400 transition-colors cursor-pointer" title="Editar nota">
@@ -3033,6 +3056,18 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             });
         }
 
+        function toggleEstadoNota(noteId, isChecked) {
+            if (!activeNotesKey || !bomNotes[activeNotesKey]) return;
+            const note = bomNotes[activeNotesKey].find(n => n.id === noteId);
+            if (note) {
+                note.status = isChecked ? "gestionada" : "creada";
+                note.date = new Date().toISOString();
+            }
+            renderModalNotas();
+            filtrarYRenderizarTabla();
+            mostrarToast(isChecked ? "Nota marcada como gestionada." : "Nota marcada como creada.");
+        }
+
         function agregarNotaActual() {
             const textInput = document.getElementById('newNoteText');
             const text = textInput.value.trim();
@@ -3048,6 +3083,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
             const newNote = {
                 id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
                 text: text,
+                status: "creada",
                 date: new Date().toISOString()
             };
             
@@ -4750,6 +4786,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
         // ALGORITMO DE FILTRADO Y ACTUALIZACIÓN DE LA TABLA DINÁMICA
         function filtrarYRenderizarTabla() {
             const query = document.getElementById('tableSearch').value.toLowerCase();
+            const filterPendingNotes = document.getElementById('pendingNotesFilter') ? document.getElementById('pendingNotesFilter').checked : false;
 
             const tableBody = document.getElementById('bomTableBody');
             tableBody.innerHTML = '';
@@ -4872,8 +4909,15 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                         }
                     }
                 }
+                // Filtro por notas por cerrar (abiertas)
+                let cumpleNotas = true;
+                if (filterPendingNotes) {
+                    const notesKey = `${item.designator}_${item.modulo}_${item.submodulo}`;
+                    const notes = bomNotes[notesKey] || [];
+                    cumpleNotas = notes.some(note => (note.status || 'creada') === 'creada');
+                }
 
-                return cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto && cumpleLowCost;
+                return cumpleQuery && cumpleMod && cumpleSub && cumpleDTC && cumplePareto && cumpleLowCost && cumpleNotas;
             });
 
             // 2. Ordenar por part number si el filtro de Precios Inconsistentes está activo
@@ -4894,8 +4938,19 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                 row.className = `hover:bg-slate-800/40 transition-all duration-200 group ${item.excluido ? 'opacity-40' : ''}`;
 
                 const notesKey = `${item.designator}_${item.modulo}_${item.submodulo}`;
-                const hasNotes = bomNotes[notesKey] && bomNotes[notesKey].length > 0;
-                const iconColorClass = hasNotes ? 'text-emerald-500 hover:text-emerald-400' : 'text-slate-500 hover:text-slate-400';
+                const notes = bomNotes[notesKey] || [];
+                let iconColorClass = 'text-slate-500 hover:text-slate-400';
+                let notesTitleTooltip = 'Añadir notas';
+                if (notes.length > 0) {
+                    const hasPending = notes.some(note => (note.status || 'creada') === 'creada');
+                    if (hasPending) {
+                        iconColorClass = 'text-amber-500 hover:text-amber-400';
+                        notesTitleTooltip = 'Ver/Editar notas (Tiene notas creadas/pendientes)';
+                    } else {
+                        iconColorClass = 'text-emerald-500 hover:text-emerald-400';
+                        notesTitleTooltip = 'Ver/Editar notas (Todas las notas gestionadas)';
+                    }
+                }
 
                 let partNumberHTML = `<span class="text-slate-500 select-none">N/A</span>`;
                 if (item.partNumber && item.partNumber !== 'N/A' && item.partNumber.trim() !== '') {
@@ -4948,7 +5003,7 @@ U2;Transceptor CAN FD, 3.3V, SOIC-8;1;MICROCHIP;MCP2562FD-E/SN;US$0,8500;US$0,85
                             <button type="button" 
                                 onclick="openNotesModal('${item.designator.replace(/'/g, "\\'")}', '${item.modulo.replace(/'/g, "\\'")}', '${item.submodulo.replace(/'/g, "\\'")}')" 
                                 class="focus:outline-none transition-colors duration-150 shrink-0 ${iconColorClass}" 
-                                title="${hasNotes ? 'Ver/Editar notas (Tiene notas)' : 'Añadir notas'}">
+                                title="${notesTitleTooltip}">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                 </svg>
